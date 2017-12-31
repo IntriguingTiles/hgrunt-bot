@@ -81,7 +81,6 @@ function play(guild, line) {
     const connection = serverQueue.connection;
 
     const dispatcher = connection.playFile(`./hgrunt/${line}`).on("end", () => {
-        console.log("playing " + line);
         serverQueue.lines.shift();
         play(guild, serverQueue.lines[0]);
     });
