@@ -10,7 +10,7 @@ client.login(process.env.DISCORD_TOKEN);
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
     client.loadCommands();
-    client.user.setGame(`${prefix}help`);
+    client.user.setGame(`${prefix}say`);
 });
 
 client.on("message", async msg => {

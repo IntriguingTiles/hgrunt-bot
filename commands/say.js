@@ -41,6 +41,6 @@ exports.run = async (client, msg, args) => {
         msg.react("👌");
         voice.addLines(msg, lines);
     } else {
-        tempMessage(msg.channel, "You did not provide any words!", 5000);
+        tempMessage(msg.channel, "You did not provide any words for me to say!", 5000);
     }
 };
