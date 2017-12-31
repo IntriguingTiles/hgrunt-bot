@@ -12,6 +12,8 @@ const voiceLines = fs.readdirSync("./hgrunt").reverse();
  */
 exports.run = async (client, msg, args) => {
     if (args.length > 0) {
+        if (!msg.member.voiceChannel) return tempMessage(msg.channel, "Join a voice channel first!", 5000);
+
         const lines = ["clik.wav"];
 
         for (let i = 0; i < args.length; i++) {
