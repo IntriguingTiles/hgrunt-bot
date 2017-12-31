@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# This has content copyrighted by Valve, don't really want to include that
+hgrunt/
+

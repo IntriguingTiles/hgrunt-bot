@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/IntriguingTiles/hgrunt-bot/issues"
   },
-  "homepage": "https://github.com/IntriguingTiles/hgrunt-bot#readme"
+  "homepage": "https://github.com/IntriguingTiles/hgrunt-bot#readme",
+  "dependencies": {
+    "bufferutil": "^3.0.3",
+    "discord.js": "^11.2.1",
+    "dotenv": "^4.0.0",
+    "eslint": "^4.14.0",
+    "node-opus": "^0.2.7",
+    "sodium": "2.0.1"
+  }
 }
