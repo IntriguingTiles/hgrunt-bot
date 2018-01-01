@@ -47,9 +47,14 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
 
     const lines = [location + firstLine];
 
+    let usedVoxLine = false;
+
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         let foundLine = false;
+
+        if (arg === "vox") usedVoxLine = true;
+        if (usedVoxLine) return tempMessage("vox line used too many times!");
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];
