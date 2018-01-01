@@ -20,7 +20,7 @@ exports.run = async (client, msg, args) => {
             parse(msg, args, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
-        tempMessage(msg.channel, "You did not provide any words for me to say!", 5000);
+        tempMessage(msg.channel, "```Usage: h!say [vox] <words>```", 5000);
     }
 };
 
@@ -33,8 +33,9 @@ exports.run = async (client, msg, args) => {
  */
 function parse(msg, args, voiceLines, firstLine, lastLine) {
     if (!msg.member.voiceChannel) return tempMessage(msg.channel, "Join a voice channel first!", 5000);
+    const location = voiceLines === voxVoiceLines ? "./vox/" : "./hgrunt/";
 
-    const lines = [firstLine];
+    const lines = [location + firstLine];
 
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
@@ -45,7 +46,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
 
             if (voiceLine.startsWith(arg.toLowerCase().replace(",", ""))) {
                 // found the voice line
-                lines.push(voiceLine);
+                lines.push(location + voiceLine);
                 foundLine = true;
                 break;
             }
@@ -60,7 +61,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         if (arg.includes(",")) lines.push("_comma.wav");
     }
 
-    if (lastLine) lines.push(lastLine);
+    if (lastLine) lines.push(location + lastLine);
     msg.react("👌");
     voice.addLines(msg, lines);
 }
