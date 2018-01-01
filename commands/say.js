@@ -1,10 +1,14 @@
 const fs = require("fs");
 const tempMessage = require("../utils/tempmessage.js");
 const voice = require("../utils/voice.js");
+const moment = require("moment");
+require("moment-duration-format");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const hgruntVoiceLines = fs.readdirSync("./hgrunt");
 const voxVoiceLines = fs.readdirSync("./vox");
+
+const rateLimitedUsers = new Map();
 
 /**
  * @param {Client} client
@@ -32,6 +36,11 @@ exports.run = async (client, msg, args) => {
  * @param {string} lastLine 
  */
 function parse(msg, args, voiceLines, firstLine, lastLine) {
+    if (rateLimitedUsers.has(msg.author.id)) {
+        tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
+        return;
+    }
+
     if (!msg.member.voiceChannel) return tempMessage(msg.channel, "Join a voice channel first!", 5000);
     const location = voiceLines === voxVoiceLines ? "./vox/" : "./hgrunt/";
 
@@ -64,4 +73,9 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
     if (lastLine) lines.push(location + lastLine);
     msg.react("👌");
     voice.addLines(msg, lines);
+
+    rateLimitedUsers.set(msg.author.id, Date.now() + 5000);
+    setTimeout(() => {
+        rateLimitedUsers.delete(msg.author.id);
+    }, 5000);
 }
