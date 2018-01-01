@@ -3,7 +3,7 @@ const tempMessage = require("../utils/tempmessage.js");
 const voice = require("../utils/voice.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
-const hgruntVoiceLines = fs.readdirSync("./hgrunt").reverse();
+const hgruntVoiceLines = fs.readdirSync("./hgrunt");
 const voxVoiceLines = fs.readdirSync("./vox");
 
 /**
