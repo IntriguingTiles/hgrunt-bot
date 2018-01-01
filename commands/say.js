@@ -16,7 +16,7 @@ const rateLimitedUsers = new Map();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length <= 20) return tempMessage(msg.channel, "Too many words!", 5000);
+    if (args.length >= 20) return tempMessage(msg.channel, "Too many words!", 5000);
     if (args.length > 0) {
         if (args[0] === "vox") {
             args.shift(); // remove vox from args
