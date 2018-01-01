@@ -80,7 +80,7 @@ function play(guild, line) {
 
     const connection = serverQueue.connection;
 
-    const dispatcher = connection.playFile(`./hgrunt/${line}`).on("end", () => {
+    const dispatcher = connection.playFile(`${line}`).on("end", () => {
         serverQueue.lines.shift();
         play(guild, serverQueue.lines[0]);
     });
