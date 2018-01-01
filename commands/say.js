@@ -16,7 +16,7 @@ const rateLimitedUsers = new Map();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length <= 10) return tempMessage(msg.channel, "Too many words!", 5000);
+    if (args.length <= 20) return tempMessage(msg.channel, "Too many words!", 5000);
     if (args.length > 0) {
         if (args[0] === "vox") {
             args.shift(); // remove vox from args
@@ -75,8 +75,8 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
     msg.react("👌");
     voice.addLines(msg, lines);
 
-    rateLimitedUsers.set(msg.author.id, Date.now() + 5000);
+    rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
     setTimeout(() => {
         rateLimitedUsers.delete(msg.author.id);
-    }, 5000);
+    }, 10000);
 }
