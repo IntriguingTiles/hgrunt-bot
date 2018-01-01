@@ -19,6 +19,7 @@ exports.run = async (client, msg, args) => {
     if (args.length >= 20) return tempMessage(msg.channel, "Too many words!", 5000);
     if (args.length > 0) {
         if (args[0] === "vox") {
+            if (args.length > 2) return tempMessage(msg.channel, "```Usage: h!say [vox] <words>```", 5000);
             args.shift(); // remove vox from args
             parse(msg, args, voxVoiceLines, "dadeda.wav");
         } else {
@@ -47,14 +48,9 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
 
     const lines = [location + firstLine];
 
-    let usedVoxLine = false;
-
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         let foundLine = false;
-
-        if (arg === "vox") usedVoxLine = true;
-        if (usedVoxLine) return tempMessage(msg.channel, "vox line used too many times!", 5000);
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];
