@@ -1,7 +1,7 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const fs = require("fs");
-const prefix = "h!";
+const prefix = "!";
 
 const client = new Discord.Client({ disableEveryone: true});
 
