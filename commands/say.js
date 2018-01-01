@@ -54,7 +54,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         let foundLine = false;
 
         if (arg === "vox") usedVoxLine = true;
-        if (usedVoxLine) return tempMessage("vox line used too many times!");
+        if (usedVoxLine) return tempMessage(msg.channel, "vox line used too many times!", 5000);
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];
