@@ -52,12 +52,12 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         const arg = args[i];
         let foundLine = false;
 
-        if (args.filter(item => item.replace("!", "").replace(",", "").toLowerCase() === arg.replace("!", "").replace(",", "").toLowerCase()).length >= 3) return tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
+        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3) return tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];
 
-            if (voiceLine.startsWith(arg.toLowerCase().replace(",", ""))) {
+            if (voiceLine.startsWith(arg.toLowerCase().replace(",", "").replace(".", ""))) {
                 // found the voice line
                 lines.push(location + voiceLine);
                 foundLine = true;
@@ -73,6 +73,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         }
 
         if (arg.includes(",")) lines.push("_comma.wav");
+        if (arg.includes(".")) lines.push("_period.wav");
     }
 
     if (lastLine) lines.push(location + lastLine);
