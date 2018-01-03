@@ -61,3 +61,6 @@ typings/
 hgrunt/
 vox/
 
+# This is our log file
+no_line.txt
+
