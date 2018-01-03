@@ -52,7 +52,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         const arg = args[i];
         let foundLine = false;
 
-        if (args.filter(item => item === arg).length >= 3) return tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
+        if (args.filter(item => item.replace("!", "").replace(",", "") === arg.replace("!", "").replace(",", "")).length >= 3) return tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];
