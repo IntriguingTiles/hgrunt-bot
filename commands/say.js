@@ -68,7 +68,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         if (!foundLine) {
             msg.react("❌");
             tempMessage(msg.channel, `I couldn't find the word \`${arg}\` in my word list!`, 5000);
-            if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${args}`);
+            if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`);
             return;
         }
 
