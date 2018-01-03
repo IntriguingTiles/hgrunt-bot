@@ -26,7 +26,7 @@ exports.run = async (client, msg, args) => {
             parse(msg, args, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
-        tempMessage(msg.channel, "```Usage: h!say [vox] <words>```", 5000);
+        tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
     }
 };
 
