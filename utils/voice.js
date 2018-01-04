@@ -73,7 +73,6 @@ function play(guild, line) {
     const serverQueue = exports.queue.get(guild.id);
 
     if (!line) {
-        serverQueue.voiceChannel.leave();
         exports.queue.delete(guild.id);
         return;
     }
