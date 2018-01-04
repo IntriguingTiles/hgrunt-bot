@@ -55,7 +55,11 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         const arg = args[i];
         let foundLine = false;
 
-        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3) return tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
+        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3) {
+            msg.react("❌");
+            tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
+            return;
+        }
 
         for (let j = 0; j < voiceLines.length; j++) {
             const voiceLine = voiceLines[j];

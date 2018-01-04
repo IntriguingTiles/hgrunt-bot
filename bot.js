@@ -26,6 +26,10 @@ client.on("message", async msg => {
     }
 });
 
+client.on("voiceStateUpdate", (oldMember, newMember) => {
+    if (newMember.guild.voiceConnection.channel.members.size) newMember.guild.voiceConnection.channel.leave();
+});
+
 client.loadCommands = () => {
     const commands = fs.readdirSync("./commands/");
     client.commands = {};
