@@ -28,7 +28,7 @@ client.on("message", async msg => {
 
 client.on("voiceStateUpdate", (oldMember, newMember) => {
     if (newMember.guild.voiceConnection) {
-        if (newMember.guild.voiceConnection.channel.members.size) newMember.guild.voiceConnection.channel.leave();
+        if (newMember.guild.voiceConnection.channel.members.size === 1) newMember.guild.voiceConnection.channel.leave();
     }
 });
 
