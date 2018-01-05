@@ -14,6 +14,7 @@ client.on("ready", () => {
 });
 
 client.on("message", async msg => {
+    if (msg.guild.id === 154305477323390976 && msg.channel.id !== 297518974730764288) return; // only do things in #bot-commands in the HL Discord server
     if (!msg.content.startsWith(prefix)) return;
     if (msg.author.bot) return;
     if (msg.channel.type !== "text") return;
@@ -31,6 +32,8 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         if (newMember.guild.voiceConnection.channel.members.size === 1) newMember.guild.voiceConnection.channel.leave();
     }
 });
+
+process.on("unhandledRejection", err => console.error(`Unhandled promise rejection!\n${err.stack}`));
 
 client.loadCommands = () => {
     const commands = fs.readdirSync("./commands/");
