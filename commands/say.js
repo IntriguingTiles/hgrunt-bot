@@ -16,13 +16,13 @@ const rateLimitedUsers = new Map();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length >= 20 && msg.guild.id !== 154305477323390976) {
+    if (args.length >= 20) {
         msg.react("❌");
         tempMessage(msg.channel, "Too many words!", 5000);
     }
     if (args.length > 0) {
         if (args[0] === "vox") {
-            if (msg.guild.id !== 154305477323390976) if (args.length < 2) return tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
+            if (args.length < 2) return tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
             args.shift(); // remove vox from args
             parse(msg, args, voxVoiceLines, "dadeda.wav");
         } else {
@@ -55,8 +55,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         const arg = args[i];
         let foundLine = false;
 
-        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3 &&
-    msg.guild.id !== 154305477323390976) {
+        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3) {
             msg.react("❌");
             tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
             return;
