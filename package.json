@@ -20,6 +20,8 @@
     "bufferutil": "^3.0.3",
     "discord.js": "^11.2.1",
     "dotenv": "^4.0.0",
+    "enmap": "^0.4.2",
+    "enmap-level": "^1.0.0",
     "erlpack": "github:hammerandchisel/erlpack",
     "eslint": "^4.14.0",
     "moment": "^2.20.1",

@@ -64,3 +64,6 @@ vox/
 # This is our log file
 no_line.txt
 
+# Enmap data
+data/
+

@@ -16,7 +16,8 @@ const rateLimitedUsers = new Map();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length >= 20) {
+    const shouldLimit = client.guildSettings.get(msg.guild.id).limits;
+    if (shouldLimit && args.length >= 20) {
         msg.react("❌");
         tempMessage(msg.channel, "Too many words!", 5000);
     }
@@ -24,9 +25,9 @@ exports.run = async (client, msg, args) => {
         if (args[0] === "vox") {
             if (args.length < 2) return tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
             args.shift(); // remove vox from args
-            parse(msg, args, voxVoiceLines, "dadeda.wav");
+            parse(msg, args, shouldLimit, voxVoiceLines, "dadeda.wav");
         } else {
-            parse(msg, args, hgruntVoiceLines, "clik.wav", "clik.wav");
+            parse(msg, args, shouldLimit, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
         tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
@@ -36,17 +37,18 @@ exports.run = async (client, msg, args) => {
 /**
  * @param {Message} msg
  * @param {string[]} args 
+ * @param {boolean} shouldLimit
  * @param {string[]} voiceLines 
  * @param {string} firstLine 
  * @param {string} lastLine 
  */
-function parse(msg, args, voiceLines, firstLine, lastLine) {
+function parse(msg, args, shouldLimit, voiceLines, firstLine, lastLine) {
     if (rateLimitedUsers.has(msg.author.id)) {
         tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
         return;
     }
 
-    if (!msg.member.voiceChannel) return tempMessage(msg.channel, "Join a voice channel first!", 5000);
+    if (!msg.member.voiceChannel) return msg.channel.send("Join a voice channel first!");
     const location = voiceLines === voxVoiceLines ? "./vox/" : "./hgrunt/";
 
     const lines = [location + firstLine];
@@ -55,9 +57,9 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
         const arg = args[i];
         let foundLine = false;
 
-        if (args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length >= 3) {
+        if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
             msg.react("❌");
-            tempMessage(msg.channel, `You used the word \`${arg}\` too many times!`, 5000);
+            msg.channel.send(`You used the word \`${arg}\` too many times!`);
             return;
         }
 
@@ -74,7 +76,7 @@ function parse(msg, args, voiceLines, firstLine, lastLine) {
 
         if (!foundLine) {
             msg.react("❌");
-            tempMessage(msg.channel, `I couldn't find the word \`${arg}\` in my word list!`, 5000);
+            msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!`);
             if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => {});
             return;
         }
