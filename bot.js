@@ -26,6 +26,10 @@ client.on("guildCreate", async guild => {
     client.guildSettings.set(guild.id, defaultSettings);
 });
 
+client.on("guildDelete", guild => {
+    client.guildSettings.delete(guild.id);
+});
+
 client.on("message", async msg => {
     const guildSettings = client.guildSettings.get(msg.guild.id);
     if (msg.guild.id === 154305477323390976 && msg.channel.id !== 297518974730764288) return; // only do things in #bot-commands in the HL Discord server

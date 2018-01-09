@@ -10,6 +10,8 @@ exports.run = async(client, msg) => {
 
         guildSettings.limits = !guildSettings.limits;
 
+        client.guildSettings.set(msg.guild.id, guildSettings);
+
         if (guildSettings.limits) {
             msg.channel.send("Limits enabled!");
         } else {
