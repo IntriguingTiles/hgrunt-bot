@@ -16,18 +16,19 @@ const rateLimitedUsers = new Map();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    const shouldLimit = client.guildSettings.get(msg.guild.id).limits;
+    const guildSettings = client.guildSettings.get(msg.guild.id);
+    const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
         msg.react("❌");
-        tempMessage(msg.channel, "Too many words!", 5000);
+        msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use ${guildSettings.prefix}limits to disable the limits.`);
     }
     if (args.length > 0) {
         if (args[0] === "vox") {
             if (args.length < 2) return tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
             args.shift(); // remove vox from args
-            parse(msg, args, shouldLimit, voxVoiceLines, "dadeda.wav");
+            parse(msg, args, guildSettings, voxVoiceLines, "dadeda.wav");
         } else {
-            parse(msg, args, shouldLimit, hgruntVoiceLines, "clik.wav", "clik.wav");
+            parse(msg, args, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
         tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
@@ -37,12 +38,12 @@ exports.run = async (client, msg, args) => {
 /**
  * @param {Message} msg
  * @param {string[]} args 
- * @param {boolean} shouldLimit
  * @param {string[]} voiceLines 
  * @param {string} firstLine 
  * @param {string} lastLine 
  */
-function parse(msg, args, shouldLimit, voiceLines, firstLine, lastLine) {
+function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
+    const shouldLimit = guildSettings.limits;
     if (rateLimitedUsers.has(msg.author.id)) {
         tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
         return;
@@ -59,7 +60,7 @@ function parse(msg, args, shouldLimit, voiceLines, firstLine, lastLine) {
 
         if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
             msg.react("❌");
-            msg.channel.send(`You used the word \`${arg}\` too many times!`);
+            msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use ${guildSettings.prefix}limits to disable the limits.`);
             return;
         }
 
