@@ -3,9 +3,18 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const Enmap = require("enmap");
 const EnmapLevel = require("enmap-level");
+const Cleverbot = require("cleverbot-node");
 
-const client = new Discord.Client({ disableEveryone: true});
-client.guildSettings = new Enmap({provider: new EnmapLevel({name: "guildSettings"})});
+const cleverbot = new Cleverbot;
+cleverbot.configure({ botapi: process.env.CB_KEY });
+
+
+const client = new Discord.Client({ disableEveryone: true });
+client.guildSettings = new Enmap({ provider: new EnmapLevel({ name: "guildSettings" }) });
+
+client.mSent = 0;
+
+const shouldLog = false;
 
 const defaultSettings = {
     prefix: "!", // command prefix
@@ -26,13 +35,25 @@ client.on("guildCreate", async guild => {
     client.guildSettings.set(guild.id, defaultSettings);
 });
 
-client.on("guildDelete", guild => {
+client.on("guildDelete", async guild => {
     client.guildSettings.delete(guild.id);
 });
 
 client.on("message", async msg => {
+    const prefixMention = new RegExp(`^<@!?${client.user.id}> `);
     const guildSettings = client.guildSettings.get(msg.guild.id);
-    if (msg.guild.id === 154305477323390976 && msg.channel.id !== 297518974730764288) return; // only do things in #bot-commands in the HL Discord server
+
+    if (prefixMention.test(msg.content) && msg.author.bot && client.mSent < 100) {
+        // yes, this is only supposed to respond to bots. not a bug.
+        msg.channel.startTyping();
+        cleverbot.write(msg.content.replace(prefixMention, ""), response => {
+            msg.channel.send("<@" + msg.author.id + "> " + response.output).catch(console.error);
+            msg.channel.stopTyping();
+            client.mSent++;
+        });
+        return;
+    }
+
     if (!msg.content.startsWith(guildSettings.prefix)) return;
     if (msg.author.bot) return;
     if (msg.channel.type !== "text") return; // only do things in a text channel
@@ -50,6 +71,37 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         if (newMember.guild.voiceConnection.channel.members.size === 1) newMember.guild.voiceConnection.channel.leave();
     }
 });
+
+// Bot logging
+if (shouldLog) {
+    client.on("messageReactionAdd", (reaction, user) => {
+        if (reaction.message.guild.id === "154305477323390976") {
+            const embed = new Discord.RichEmbed();
+            embed.setAuthor(user.tag, user.avatarURL);
+            embed.setDescription(`Added a reaction to a message sent by ${reaction.message.author} in ${reaction.message.channel}`);
+            if (reaction.message.content) embed.addField("Message", reaction.message.content);
+            embed.addField("Emoji", reaction.emoji.toString());
+            embed.setColor(0x23D160);
+            embed.setFooter(`ID: ${user.id}`);
+            embed.setTimestamp();
+            client.channels.get("154637540341710848").send({ embed });
+        }
+    });
+
+    client.on("messageReactionRemove", (reaction, user) => {
+        if (reaction.message.guild.id === "154305477323390976") {
+            const embed = new Discord.RichEmbed();
+            embed.setAuthor(user.tag, user.avatarURL);
+            embed.setDescription(`Removed a reaction to a message sent by ${reaction.message.author} in ${reaction.message.channel}`);
+            if (reaction.message.content) embed.addField("Message", reaction.message.content);
+            embed.addField("Emoji", reaction.emoji.toString());
+            embed.setColor(0xFF470F);
+            embed.setFooter(`ID: ${user.id}`);
+            embed.setTimestamp();
+            client.channels.get("154637540341710848").send({ embed });
+        }
+    });
+}
 
 process.on("unhandledRejection", err => console.error(`Unhandled promise rejection!\n${err.stack}`));
 

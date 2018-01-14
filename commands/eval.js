@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars*/
 const Discord = require("discord.js");
 const fs = require("fs");
-const {Client, Message} = require("discord.js");
+const { Client, Message } = require("discord.js");
 
 /**
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async(client, msg, args) => {
+exports.run = async (client, msg, args) => {
     if (msg.author.id !== "221017760111656961") {
         msg.reply(":no_entry: **I! WILL! KICK! YOUR! ASS!** :no_entry:");
         return;

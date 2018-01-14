@@ -78,7 +78,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
         if (!foundLine) {
             msg.react("❌");
             msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!`);
-            if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => {});
+            if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => { });
             return;
         }
 
