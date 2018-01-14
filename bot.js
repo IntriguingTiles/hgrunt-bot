@@ -26,7 +26,7 @@ client.login(process.env.DISCORD_TOKEN);
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
     client.loadCommands();
-    client.user.setGame("!say");
+    client.user.setActivity("!say");
     // now that the prefix could change on a per-guild basis, what do we do here? :thinking:
     // for now, we'll leave it as the default prefix.
 });
