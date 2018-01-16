@@ -43,13 +43,13 @@ client.on("message", async msg => {
     const prefixMention = new RegExp(`^<@!?${client.user.id}> `);
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
-    if (prefixMention.test(msg.content) && msg.author.bot && client.mSent < 100) {
-        // yes, this is only supposed to respond to bots. not a bug.
+    if (prefixMention.test(msg.content)) {
+        if (msg.author.bot && client.mSent >= 100) return;
         msg.channel.startTyping();
         cleverbot.write(msg.content.replace(prefixMention, ""), response => {
-            msg.channel.send("<@" + msg.author.id + "> " + response.output).catch(console.error);
+            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             msg.channel.stopTyping();
-            client.mSent++;
+            if (msg.author.bot) client.mSent++;
         });
         return;
     }
