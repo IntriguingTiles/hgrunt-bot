@@ -16,6 +16,8 @@ client.mSent = 0;
 
 const shouldLog = false;
 
+let prefixMention;
+
 const defaultSettings = {
     prefix: "!", // command prefix
     limits: true // should we enable limits
@@ -27,6 +29,7 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
     client.loadCommands();
     client.user.setActivity("!say");
+    prefixMention = new RegExp(`^<@!?${client.user.id}> `);
     // now that the prefix could change on a per-guild basis, what do we do here? :thinking:
     // for now, we'll leave it as the default prefix.
 });
@@ -40,9 +43,10 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    const prefixMention = new RegExp(`^<@!?${client.user.id}> `);
+    if (msg.channel.type !== "text") return; // only do things in a text channel
+    if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
     const guildSettings = client.guildSettings.get(msg.guild.id);
-
+    
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
         msg.channel.startTyping();
@@ -53,10 +57,9 @@ client.on("message", async msg => {
         });
         return;
     }
-
-    if (!msg.content.startsWith(guildSettings.prefix)) return;
+    
     if (msg.author.bot) return;
-    if (msg.channel.type !== "text") return; // only do things in a text channel
+    if (!msg.content.startsWith(guildSettings.prefix)) return;
 
     const args = msg.content.split(" ").slice(1);
     const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
