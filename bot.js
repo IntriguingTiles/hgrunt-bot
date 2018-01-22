@@ -50,6 +50,7 @@ client.on("message", async msg => {
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
         msg.channel.startTyping();
+        if (msg.content.replace(prefixMention, "") === "") return msg.channel.send(`${msg.author} don't even try that gay shit on me`);
         cleverbot.write(msg.content.replace(prefixMention, ""), response => {
             msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             msg.channel.stopTyping();
