@@ -51,15 +51,15 @@ client.on("message", async msg => {
         if (msg.content.replace(prefixMention, "") === "") return msg.channel.send(`${msg.author} don't even try that gay shit on me`);
         msg.channel.startTyping();
         cleverbot.write(msg.content.replace(prefixMention, ""), response => {
-            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             msg.channel.stopTyping();
+            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             if (msg.author.bot) client.mSent++;
         });
         return;
     }
     
     if (msg.author.bot) return;
-    
+
     const guildSettings = client.guildSettings.get(msg.guild.id);
     if (!msg.content.startsWith(guildSettings.prefix)) return;
 
