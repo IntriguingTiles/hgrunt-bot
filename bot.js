@@ -4,17 +4,17 @@ const fs = require("fs");
 const Enmap = require("enmap");
 const EnmapLevel = require("enmap-level");
 const Cleverbot = require("cleverbot-node");
+const express = require("express");
+
+const server = express();
 
 const cleverbot = new Cleverbot;
 cleverbot.configure({ botapi: process.env.CB_KEY });
 
-
 const client = new Discord.Client({ disableEveryone: true });
 client.guildSettings = new Enmap({ provider: new EnmapLevel({ name: "guildSettings" }) });
-
 client.mSent = 0;
-
-const shouldLog = false;
+client.wordsSaid = 0;
 
 let prefixMention;
 
@@ -24,6 +24,8 @@ const defaultSettings = {
 };
 
 client.login(process.env.DISCORD_TOKEN);
+
+process.on("unhandledRejection", err => console.error(`Unhandled promise rejection!\n${err.stack}`));
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
@@ -46,10 +48,9 @@ client.on("message", async msg => {
     if (msg.channel.type !== "text") return; // only do things in a text channel
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
     const guildSettings = client.guildSettings.get(msg.guild.id);
-    
+
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
-        if (msg.content.replace(prefixMention, "") === "") return msg.channel.send(`${msg.author} don't even try that gay shit on me`);
         msg.channel.startTyping();
         cleverbot.write(msg.content.replace(prefixMention, ""), response => {
             msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
@@ -58,7 +59,7 @@ client.on("message", async msg => {
         });
         return;
     }
-    
+
     if (msg.author.bot) return;
     if (!msg.content.startsWith(guildSettings.prefix)) return;
 
@@ -75,39 +76,6 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
         if (newMember.guild.voiceConnection.channel.members.size === 1) newMember.guild.voiceConnection.channel.leave();
     }
 });
-
-// Bot logging
-if (shouldLog) {
-    client.on("messageReactionAdd", (reaction, user) => {
-        if (reaction.message.guild.id === "154305477323390976") {
-            const embed = new Discord.RichEmbed();
-            embed.setAuthor(user.tag, user.avatarURL);
-            embed.setDescription(`Added a reaction to a message sent by ${reaction.message.author} in ${reaction.message.channel}`);
-            if (reaction.message.content) embed.addField("Message", reaction.message.content);
-            embed.addField("Emoji", reaction.emoji.toString());
-            embed.setColor(0x23D160);
-            embed.setFooter(`ID: ${user.id}`);
-            embed.setTimestamp();
-            client.channels.get("154637540341710848").send({ embed });
-        }
-    });
-
-    client.on("messageReactionRemove", (reaction, user) => {
-        if (reaction.message.guild.id === "154305477323390976") {
-            const embed = new Discord.RichEmbed();
-            embed.setAuthor(user.tag, user.avatarURL);
-            embed.setDescription(`Removed a reaction to a message sent by ${reaction.message.author} in ${reaction.message.channel}`);
-            if (reaction.message.content) embed.addField("Message", reaction.message.content);
-            embed.addField("Emoji", reaction.emoji.toString());
-            embed.setColor(0xFF470F);
-            embed.setFooter(`ID: ${user.id}`);
-            embed.setTimestamp();
-            client.channels.get("154637540341710848").send({ embed });
-        }
-    });
-}
-
-process.on("unhandledRejection", err => console.error(`Unhandled promise rejection!\n${err.stack}`));
 
 client.loadCommands = () => {
     const commands = fs.readdirSync("./commands/");
@@ -127,3 +95,15 @@ client.loadCommands = () => {
     }
     console.log(`Loaded ${commands.length} commands!`);
 };
+
+// very ugly express inline html stuff below
+server.get("/", (req, res) => {
+    let final = `<h1>HGrunt Stats</h1>
+<p>Speaking in ${client.guilds.size} servers to ${client.users.size} users.<br>
+${client.wordsSaid} words spoken.</p>
+<h2>Server List</h2>\n`;
+    client.guilds.forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} with ${guild.memberCount} members.<br>`);
+    res.send(final);
+});
+
+server.listen(1337, () => console.log("Started web server on port 1337!"));
