@@ -87,6 +87,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
     }
 
     if (lastLine) lines.push(location + lastLine);
+    msg.client.wordsSaid += args.length;
     msg.react("👌");
     voice.addLines(msg, lines);
 
