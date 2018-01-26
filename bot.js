@@ -47,20 +47,26 @@ client.on("guildDelete", async guild => {
 client.on("message", async msg => {
     if (msg.channel.type !== "text") return; // only do things in a text channel
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
+<<<<<<< HEAD
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
+=======
+    
+>>>>>>> 177ea8ffe5fda6ea8ef4fc3f0ea3df7186d53996
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
         msg.channel.startTyping();
         cleverbot.write(msg.content.replace(prefixMention, ""), response => {
-            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             msg.channel.stopTyping();
+            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
             if (msg.author.bot) client.mSent++;
         });
         return;
     }
 
     if (msg.author.bot) return;
+
+    const guildSettings = client.guildSettings.get(msg.guild.id);
     if (!msg.content.startsWith(guildSettings.prefix)) return;
 
     const args = msg.content.split(" ").slice(1);
