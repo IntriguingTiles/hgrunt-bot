@@ -5,7 +5,10 @@ const moment = require("moment");
 require("moment-duration-format");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
-const hgruntVoiceLines = fs.readdirSync("./hgrunt");
+const hgruntVoiceLines = fs.readdirSync("./hgrunt").sort((a, b) => {
+    if (a.endsWith("!.wav")) return 1;
+    return a.localeCompare(b);
+});
 const voxVoiceLines = fs.readdirSync("./vox");
 
 const rateLimitedUsers = new Map();
