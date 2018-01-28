@@ -5,24 +5,40 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
     <script>
-            $(function () {
-                $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/hgrunt.json', function (data) {
-                    $.each(data, function (i, f) {
-                        $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#hgrunt tbody");
-                    });
-    
+        $(function () {
+            $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/hgrunt.json', function (data) {
+                $.each(data, function (i, f) {
+                    $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#hgrunt tbody");
                 });
-    
             });
-        </script>
+        });
+
+        $(function () {
+            $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/vox.json', function (data) {
+                $.each(data, function (i, f) {
+                    $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#vox tbody");
+                });
+            });
+        });
+    </script>
 </head>
 
 <body>
-    <h1>HGrunt Lines</h1>
-
     <table id="hgrunt" class="display" cellspacing="0" width="100%">
-        <tbody>
+        <thead>
+            <th>HGrunt Lines</th>
+        </thead>
 
+        <tbody>
+        </tbody>
+    </table>
+    <hr>
+    <table id="vox" class="display" cellspacing="0" width="100%">
+        <thead>
+            <th>VOX Lines</th>
+        </thead>
+
+        <tbody>
         </tbody>
     </table>
 </body>
