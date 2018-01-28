@@ -8,6 +8,8 @@ exports.queue = new Map();
  * @returns {VoiceChannel}
  */
 function getVoiceChannel(msg) {
+    if (msg.guild.voiceConnection) return msg.guild.voiceConnection.channel;
+    
     const channel = msg.member.voiceChannel;
 
     if (!channel) {
