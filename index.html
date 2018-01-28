@@ -8,7 +8,7 @@
             $(function () {
                 $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/hgrunt.json', function (data) {
                     $.each(data, function (i, f) {
-                        console.log(f)
+                        $("<tr>" + f.replace(".wav", "") + "</tr>").appendTo("#hgrunt tbody");
                     });
     
                 });
