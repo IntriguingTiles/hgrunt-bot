@@ -4,7 +4,17 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
-
+    <script>
+            $(function () {
+                $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/hgrunt.json', function (data) {
+                    $.each(data, function (i, f) {
+                        console.log(f)
+                    });
+    
+                });
+    
+            });
+        </script>
 </head>
 
 <body>
