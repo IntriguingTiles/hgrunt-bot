@@ -103,7 +103,7 @@ server.get("/", (req, res) => {
 <p>Speaking in ${client.guilds.size} servers to ${client.users.size} users.<br>
 ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n`;
-    client.guilds.forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} with ${guild.memberCount} members.<br>`);
+    client.guilds.forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)<br>`);
     res.send(final);
 });
 
