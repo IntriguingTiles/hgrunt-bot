@@ -9,7 +9,7 @@ exports.queue = new Map();
  */
 function getVoiceChannel(msg) {
     if (msg.guild.voiceConnection) return msg.guild.voiceConnection.channel;
-    
+
     const channel = msg.member.voiceChannel;
 
     if (!channel) {
@@ -56,7 +56,7 @@ exports.addLines = async (msg, lines) => {
         queueConstruct.lines.push.apply(queueConstruct.lines, lines);
 
         if (getVoiceChannel(msg)) {
-            const connection = await getVoiceChannel(msg).join();
+            const connection = getVoiceChannel(msg).connection ? getVoiceChannel(msg).connection : await getVoiceChannel(msg).join();
             queueConstruct.connection = connection;
             play(msg.guild, queueConstruct.lines[0]);
         } else {
