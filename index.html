@@ -5,7 +5,7 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
     <script>
-        $(function () {
+        $(document).ready(function () {
             $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/hgrunt.json', function (data) {
                 $.each(data, function (i, f) {
                     $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#hgrunt tbody");
@@ -13,12 +13,17 @@
             });
         });
 
-        $(function () {
+        $(document).ready(function () {
             $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/vox.json', function (data) {
                 $.each(data, function (i, f) {
                     $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#vox tbody");
                 });
             });
+        });
+
+        $(window).load(function () {
+            $("#hgrunt").DataTable();
+            $("#vox").DataTable();
         });
     </script>
 </head>
@@ -41,11 +46,4 @@
         <tbody>
         </tbody>
     </table>
-
-    <script>
-        $(window).load(function () {
-            $("#hgrunt").DataTable();
-            $("#vox").DataTable();
-        });
-    </script>
 </body>
