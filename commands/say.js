@@ -24,6 +24,7 @@ exports.run = async (client, msg, args) => {
     if (shouldLimit && args.length >= 20) {
         msg.react("❌");
         msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use ${guildSettings.prefix}limits to disable the limits.`);
+        return;
     }
     if (args.length > 0) {
         if (args[0] === "vox") {
