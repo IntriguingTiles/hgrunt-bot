@@ -28,14 +28,14 @@ exports.run = async (client, msg, args) => {
     }
     if (args.length > 0) {
         if (args[0] === "vox") {
-            if (args.length < 2) return tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
+            if (args.length < 2) return msg.channel.send("```Usage: !say [vox] <words>```");
             args.shift(); // remove vox from args
             parse(msg, args, guildSettings, voxVoiceLines, "dadeda.wav");
         } else {
             parse(msg, args, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
-        tempMessage(msg.channel, "```Usage: !say [vox] <words>```", 5000);
+        msg.channel.send("```Usage: !say [vox] <words>```");
     }
 };
 
@@ -81,7 +81,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
 
         if (!foundLine) {
             msg.react("❌");
-            msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!`);
+            msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`);
             if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => { });
             return;
         }
