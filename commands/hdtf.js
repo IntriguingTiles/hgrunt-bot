@@ -27,7 +27,7 @@ exports.run = async (client, msg, args) => {
             for (let j = 0; j < args[i].length; j++) {
                 const char = args[i].charAt(j);
                 
-                if (!fs.existsSync(`./hdtf/${char}.png`)) continue;
+                if (!fs.existsSync(`./hdtf/${char}.png`)) return msg.channel.send(`I can't use the character \`${char}\``);
 
                 const letter = await Jimp.read(`./hdtf/${char}.png`);
                 image.composite(letter, currentX, 0);
