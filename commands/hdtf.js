@@ -1,5 +1,6 @@
 const Jimp = require("jimp");
 const { Client, Message, Attachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const fs = require("fs");
 
 /**
  * @param {Client} client
@@ -11,27 +12,32 @@ exports.run = async (client, msg, args) => {
 
     let realLength = 0;
 
-    for (let i = 0; i < args.length; i++) realLength += args[i].length;
+    for (let i = 0; i < args.length; i++) {
+        realLength += args[i].length;
+    }
 
     const wordsImageWidth = (realLength + args.length) * 34 - 34;
     const wordsImageHeight = 44;
 
-    const wordsImage = new Jimp(wordsImageWidth, wordsImageHeight, async function (err, image) {
+    new Jimp(wordsImageWidth, wordsImageHeight, async function (err, image) {
         if (err) return msg.channel.send("Failed to create image!");
         let currentX = 0;
 
         for (let i = 0; i < args.length; i++) {
             for (let j = 0; j < args[i].length; j++) {
                 const char = args[i].charAt(j);
+                
+                if (!fs.existsSync(`./hdtf/${char}.png`)) continue;
+
                 const letter = await Jimp.read(`./hdtf/${char}.png`);
-                wordsImage.composite(letter, currentX, 0);
+                image.composite(letter, currentX, 0);
                 currentX += 34;
             }
             currentX += 34;
         }
         const bannerImage = await Jimp.read("./hdtf/banner.png");
-        wordsImage.resize(bannerImage.bitmap.width, 44, Jimp.RESIZE_NEAREST_NEIGHBOR);
-        bannerImage.composite(wordsImage, 0, bannerImage.bitmap.height - 44);
+        image.resize(bannerImage.bitmap.width, 44, Jimp.RESIZE_NEAREST_NEIGHBOR);
+        bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
         bannerImage.getBuffer(Jimp.AUTO, function (err, buffer) {
             msg.channel.send(new Attachment(buffer, "hdtf.png"));
             msg.channel.stopTyping();
