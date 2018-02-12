@@ -38,6 +38,7 @@ exports.run = async (client, msg, args) => {
         const bannerImage = await Jimp.read("./hdtf/banner.png");
         image.resize(bannerImage.bitmap.width, 44, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
+        bannerImage.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.getBuffer(Jimp.AUTO, function (err, buffer) {
             msg.channel.send(new Attachment(buffer, "hdtf.png"));
             msg.channel.stopTyping();
