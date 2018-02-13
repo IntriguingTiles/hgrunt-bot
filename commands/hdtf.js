@@ -13,7 +13,7 @@ exports.run = async (client, msg, args) => {
     let realLength = 0;
 
     for (let i = 0; i < args.length; i++) {
-        args[i].replace(/[^A-z]+/g, "");
+        args[i] = args[i].replace(/[^A-z]+/g, "");
         realLength += args[i].length;
     }
 
