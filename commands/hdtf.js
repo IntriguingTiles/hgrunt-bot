@@ -13,7 +13,7 @@ exports.run = async (client, msg, args) => {
     let realLength = 0;
 
     for (let i = 0; i < args.length; i++) {
-        args[i] = args[i].replace(/[^A-z]+/g, "");
+        args[i] = args[i].replace(/[^A-z0-9.,'\-!?]+/g, "");
         realLength += args[i].length;
     }
 
@@ -26,7 +26,8 @@ exports.run = async (client, msg, args) => {
 
         for (let i = 0; i < args.length; i++) {
             for (let j = 0; j < args[i].length; j++) {
-                const char = args[i].charAt(j);
+                let char = args[i].charAt(j);
+                if (char === "?") char = "qmark";
                 
                 if (!fs.existsSync(`./hdtf/${char}.png`)) return msg.channel.send(`I can't use the character \`${char}\``);
 
