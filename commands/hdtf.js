@@ -12,7 +12,7 @@ exports.run = async (client, msg, args) => {
     let realLength = 0;
 
     for (let i = 0; i < args.length; i++) {
-        args[i] = args[i].replace(/[^A-z0-9.,'\-!?]+/g, "");
+        args[i] = args[i].replace(/[^a-zA-Z0-9.,'\-!?]+/g, "");
         realLength += args[i].length;
     }
 
