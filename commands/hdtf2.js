@@ -6,7 +6,7 @@ const hdtf = require("../utils/hdtf.js");
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length <= 0) return msg.channel.send("```Usage: !hdtf <words>```");
+    if (args.length <= 0) return msg.channel.send("```Usage: !hdtf2 <words>```");
 
-    hdtf(msg, args, "./hdtf/banner.png");
+    hdtf(msg, args, "./hdtf/banner2.png");
 };
