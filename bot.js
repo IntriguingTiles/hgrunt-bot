@@ -61,7 +61,13 @@ client.on("message", async msg => {
 
     if (msg.author.bot) return;
 
-    const guildSettings = client.guildSettings.get(msg.guild.id);
+    let guildSettings = client.guildSettings.get(msg.guild.id);
+    
+    if (!guildSettings) {
+        client.guildSettings.set(msg.guild.id, defaultSettings);
+        guildSettings = client.guildSettigns.get(msg.guild.id);
+    }
+
     if (!msg.content.startsWith(guildSettings.prefix)) return;
 
     const args = msg.content.split(" ").slice(1);
