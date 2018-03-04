@@ -19,7 +19,7 @@
   "dependencies": {
     "bufferutil": "^3.0.3",
     "cleverbot-node": "^0.3.11",
-    "discord.js": "^11.3",
+    "discord.js": "^11.3.1",
     "dotenv": "^4.0.0",
     "enmap": "^0.4.2",
     "enmap-level": "^1.0.0",

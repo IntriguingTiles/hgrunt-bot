@@ -102,9 +102,9 @@ server.get("/", (req, res) => {
     let final = `<h1>HGrunt Stats</h1>
 <p>Speaking in ${client.guilds.size} servers to ${client.users.size} users.<br>
 ${client.wordsSaid} words spoken.</p>
-<h2>Server List</h2>\n`;
-    client.guilds.forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)<br>`);
-    res.send(final);
+<h2>Server List</h2>\n<pre>`;
+    client.guilds.forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)\n`);
+    res.send(final + "</pre>");
 });
 
 server.listen(1337, () => console.log("Started web server on port 1337!"));
