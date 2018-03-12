@@ -20,10 +20,10 @@ exports.run = async (client, msg, args) => {
             if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) return msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
 
             if (parseInt(date[1]).toString().length === 1) {
-                date[1] === "0" + parseInt(date[1]);
+                //date[1] === "0" + parseInt(date[1]);
             }
 
-            await msg.channel.send({ files: [garfield.request(date[0], date[1], date[2])] });
+            await msg.channel.send({ files: [garfield.request(date[0], date[1].replace("0", ""), date[2].replace("0", ""))] });
         } catch (err) {
             if (err) return msg.channel.send(err.message);
             msg.channel.send("An error occured!");
