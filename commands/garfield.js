@@ -13,11 +13,11 @@ exports.run = async (client, msg, args) => {
         // i hate mondays
     } else if (args.length === 1) {
         try {
-            if (args[0].startsWith("l")) return await msg.channel.send({ files: [garfield.latest())] });
+            if (args[0].startsWith("l")) return await msg.channel.send({ files: [garfield.latest()]});
             const date = args[0].split(/[-/]/g);
 
             if (date.length !== 3) return msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
-            if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) return msg.channel.send("```Usage: !garfield [random] [YYYY-MM-DD]```");
+            if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) return msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
 
             if (parseInt(date[1]).toString().length === 1) {
                 date[1] === "0" + parseInt(date[1]);
@@ -29,6 +29,6 @@ exports.run = async (client, msg, args) => {
             msg.channel.send("An error occured!");
         }
     } else {
-        msg.channel.send("```Usage: !garfield [random] [YYYY-MM-DD]```");
+        msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
     }
 };
