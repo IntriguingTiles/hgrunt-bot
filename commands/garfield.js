@@ -8,18 +8,22 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
  */
 exports.run = async (client, msg, args) => {
     if (args.length === 0) {
-        msg.channel.send({ files: [garfield.latest()] });
+        msg.channel.send({ files: [garfield.random()] });
     } else if (args.length === 3) {
         // i hate mondays
     } else if (args.length === 1) {
         try {
-            if (args[0].startsWith("r")) return await msg.channel.send({ files: [garfield.random()] });
+            if (args[0].startsWith("l")) return await msg.channel.send({ files: [garfield.latest())] });
             const date = args[0].split(/[-/]/g);
 
-            if (date.length !== 3) return msg.channel.send("```Usage: !garfield [random] [YYYY-MM-DD]```");
-            if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) msg.channel.send("```Usage: !garfield [random] [YYYY-MM-DD]```");
+            if (date.length !== 3) return msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
+            if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) return msg.channel.send("```Usage: !garfield [random] [YYYY-MM-DD]```");
 
-            await msg.channel.send({ files: [garfield.request(date[0], date[1].substring(1, 2), date[2])] });
+            if (parseInt(date[1]).toString().length === 1) {
+                date[1] === "0" + parseInt(date[1]);
+            }
+
+            await msg.channel.send({ files: [garfield.request(date[0], date[1], date[2])] });
         } catch (err) {
             if (err) return msg.channel.send(err.message);
             msg.channel.send("An error occured!");
