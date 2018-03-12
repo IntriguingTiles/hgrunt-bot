@@ -1,6 +1,8 @@
 const garfield = require("garfield");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
+exports.aliases = ["gf", "gar"];
+
 /**
  * @param {Client} client
  * @param {Message} msg
