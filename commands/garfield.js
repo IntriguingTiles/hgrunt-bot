@@ -25,7 +25,7 @@ exports.run = async (client, msg, args) => {
                 //date[1] === "0" + parseInt(date[1]);
             }
 
-            await msg.channel.send({ files: [garfield.request(date[0], date[1].replace("0", ""), date[2].replace("0", ""))] });
+            await msg.channel.send({ files: [garfield.request(date[0], date[1].replace(/^0/, ""), date[2].replace(/^0/, ""))] });
         } catch (err) {
             if (err) return msg.channel.send(err.message);
             msg.channel.send("An error occured!");
