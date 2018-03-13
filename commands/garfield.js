@@ -18,16 +18,19 @@ exports.run = async (client, msg, args) => {
             if (args[0].startsWith("l")) {
                 await msg.channel.send({ files: [garfield.latest()] });
                 msg.channel.stopTyping();
+                return;
             }
             const date = args[0].split(/[-/]/g);
 
             if (date.length !== 3) {
                 msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
-                return msg.channel.stopTyping();
+                msg.channel.stopTyping();
+                return;
             }
             if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) {
                 msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
-                return msg.channel.stopTyping();
+                msg.channel.stopTyping();
+                return;
             }
 
             if (date[1] === "09") date[1] = "009";
@@ -35,8 +38,7 @@ exports.run = async (client, msg, args) => {
             await msg.channel.send({ files: [garfield.request(date[0], date[1].replace(/^0/, ""), date[2].replace(/^0/, ""))] });
             msg.channel.stopTyping();
         } catch (err) {
-            if (err) return msg.channel.send(err.message);
-            msg.channel.send("An error occured!");
+            if (err) msg.channel.send(err.message);
             msg.channel.stopTyping();
         }
     } else {
