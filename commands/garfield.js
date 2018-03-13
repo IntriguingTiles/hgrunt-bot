@@ -34,6 +34,7 @@ exports.run = async (client, msg, args) => {
             }
 
             if (date[1] === "09") date[1] = "009";
+            if (date[2] === "09") date[2] = "009";
 
             await msg.channel.send({ files: [garfield.request(date[0], date[1].replace(/^0/, ""), date[2].replace(/^0/, ""))] });
             msg.channel.stopTyping();
