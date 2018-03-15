@@ -1,4 +1,5 @@
 const garfield = require("garfield");
+const moment = require("moment");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.aliases = ["gf", "gar"];
@@ -16,27 +17,27 @@ exports.run = async (client, msg, args) => {
     } else if (args.length === 1) {
         try {
             if (args[0].startsWith("l")) {
-                await msg.channel.send({ files: [garfield.latest()] });
+                console.log(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
+                await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`] });
                 msg.channel.stopTyping();
                 return;
             }
-            const date = args[0].split(/[-/]/g);
 
-            if (date.length !== 3) {
-                msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
-                msg.channel.stopTyping();
-                return;
-            }
-            if (date[0].length !== 4 || date[1].length !== 2 || date[2].length !== 2) {
+            if (!moment(args[0], moment.ISO_8601).isValid()) {
                 msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
                 msg.channel.stopTyping();
                 return;
             }
 
-            if (date[1] === "09") date[1] = "009";
-            if (date[2] === "09") date[2] = "009";
+            const date = moment(args[0], moment.ISO_8601);
 
-            await msg.channel.send({ files: [garfield.request(date[0], date[1].replace(/^0/, ""), date[2].replace(/^0/, ""))] });
+            if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
+                msg.channel.send("You can't search for comics earlier than 1978-06-19!");
+                msg.channel.stopTyping();
+                return;
+            }
+            
+            await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`] });
             msg.channel.stopTyping();
         } catch (err) {
             if (err) msg.channel.send(err.message);
