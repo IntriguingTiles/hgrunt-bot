@@ -8,7 +8,7 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
  * @param {string[]} args
  */
 exports.run = async (client, msg) => {
-    msg.channel.stopTyping();
+    msg.channel.startTyping();
     request("http://garfield.zweistein.cz/", function (err, response, html) {
         if (!err) {
             const $ = cheerio.load(html);
@@ -19,6 +19,7 @@ exports.run = async (client, msg) => {
             msg.channel.stopTyping();
         } else {
             msg.channel.send("An error has occured!");
+            msg.channel.stopTyping();
             console.error(err);
         }
     });
