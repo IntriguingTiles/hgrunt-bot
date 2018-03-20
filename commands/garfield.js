@@ -17,7 +17,7 @@ exports.run = async (client, msg, args) => {
     } else if (args.length === 1) {
         try {
             if (args[0].startsWith("l")) {
-                console.log(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
+                //console.log(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
                 await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`] });
                 msg.channel.stopTyping();
                 return;
