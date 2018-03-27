@@ -13,6 +13,12 @@ const voxVoiceLines = fs.readdirSync("./vox");
 
 const rateLimitedUsers = new Map();
 
+exports.help = {
+    name: "say",
+    usage: "say [vox] <words>",
+    info: "Speaks words in a voice channel"
+};
+
 /**
  * @param {Client} client
  * @param {Message} msg

@@ -1,4 +1,4 @@
-const {TextChannel} = require("discord.js"); // eslint-disable-line no-unused-vars
+const { TextChannel } = require("discord.js"); // eslint-disable-line no-unused-vars
 /**
  * 
  * @param {TextChannel} channel 

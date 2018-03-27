@@ -2,6 +2,12 @@ const garfield = require("garfield");
 const moment = require("moment");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
+exports.help = {
+    name: "garfield",
+    usage: "garfield [latest] [YYYY-MM-DD]",
+    info: "Now where could my pipe be?"
+};
+
 exports.aliases = ["gf", "gar"];
 
 /**
@@ -24,7 +30,7 @@ exports.run = async (client, msg, args) => {
             }
 
             if (!moment(args[0], moment.ISO_8601).isValid()) {
-                msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
+                msg.channel.send(`\`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
                 msg.channel.stopTyping();
                 return;
             }
@@ -36,7 +42,7 @@ exports.run = async (client, msg, args) => {
                 msg.channel.stopTyping();
                 return;
             }
-            
+
             await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`] });
             msg.channel.stopTyping();
         } catch (err) {
@@ -44,7 +50,7 @@ exports.run = async (client, msg, args) => {
             msg.channel.stopTyping();
         }
     } else {
-        msg.channel.send("```Usage: !garfield [latest] [YYYY-MM-DD]```");
+        msg.channel.send(`\`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
         msg.channel.stopTyping();
     }
 };

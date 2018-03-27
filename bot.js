@@ -30,7 +30,7 @@ process.on("unhandledRejection", err => console.error(`Unhandled promise rejecti
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
     client.loadCommands();
-    client.user.setActivity("!say");
+    client.user.setActivity("!help");
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
     // now that the prefix could change on a per-guild basis, what do we do here? :thinking:
     // for now, we'll leave it as the default prefix.
@@ -47,7 +47,7 @@ client.on("guildDelete", async guild => {
 client.on("message", async msg => {
     if (msg.channel.type !== "text") return; // only do things in a text channel
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
-    
+
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
         msg.channel.startTyping();
@@ -62,7 +62,7 @@ client.on("message", async msg => {
     if (msg.author.bot) return;
 
     let guildSettings = client.guildSettings.get(msg.guild.id);
-    
+
     if (!guildSettings) {
         client.guildSettings.set(msg.guild.id, defaultSettings);
         guildSettings = client.guildSettigns.get(msg.guild.id);

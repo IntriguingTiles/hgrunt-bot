@@ -1,10 +1,16 @@
-const {Client, Message} = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+
+exports.help = {
+    name: "limits",
+    usage: "limits",
+    info: "Toggles limits on the say command"
+};
 
 /**
  * @param {Client} client
  * @param {Message} msg
  */
-exports.run = async(client, msg) => {
+exports.run = async (client, msg) => {
     if (msg.member.hasPermission("MANAGE_GUILD")) {
         const guildSettings = client.guildSettings.get(msg.guild.id);
 

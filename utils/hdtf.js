@@ -17,7 +17,7 @@ module.exports = async (msg, args, banner) => {
     const wordsImageWidth = (realLength + args.length) * 34 - 34;
     const wordsImageHeight = 44;
 
-    new Jimp(wordsImageWidth, wordsImageHeight, async function (err, image) {      
+    new Jimp(wordsImageWidth, wordsImageHeight, async function (err, image) {
         let currentX = 0;
 
         for (let i = 0; i < args.length; i++) {
@@ -32,7 +32,7 @@ module.exports = async (msg, args, banner) => {
             currentX += 34;
         }
         const bannerImage = await Jimp.read(banner);
-        
+
         image.resize(bannerImage.bitmap.width, 44, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
         bannerImage.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
