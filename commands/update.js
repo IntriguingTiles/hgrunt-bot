@@ -10,9 +10,10 @@ exports.run = async (client, msg) => {
         msg.reply(":no_entry: **I! WILL! KICK! YOUR! ASS!** :no_entry:");
         return;
     }
-    
-    msg.channel.send("Grabbing the latest changes from the repo...");
+
+    const statusMsg = await msg.channel.send("Grabbing the latest changes from the repo...");
     git().reset("hard").pull(() => {
+        statusMsg.edit("Done!");
         client.loadCommands();
     });
 };
