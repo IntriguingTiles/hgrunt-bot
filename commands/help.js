@@ -42,7 +42,7 @@ exports.run = async (client, msg, args) => {
                 final += prefix + commands[i].replace(".js", "") + "\n";
             }
         }
-        final += "```";
+        final += `\`\`\`\nTo get more info about a command, use \`${prefix}help [command]\``;
         msg.channel.send(final);
     }
 };
