@@ -15,6 +15,13 @@ exports.help = {
  */
 exports.run = async (client, msg) => {
     msg.channel.startTyping();
+
+    if (new Date().getMonth() === 3 && new Date().getDate() === 1) {
+        msg.channel.send({ files: ["./nogf.png"]});
+        msg.channel.stopTyping();
+        return;
+    }
+
     request("http://garfield.zweistein.cz/", function (err, response, html) {
         if (!err) {
             const $ = cheerio.load(html);

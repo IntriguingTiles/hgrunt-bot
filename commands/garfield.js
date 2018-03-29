@@ -17,6 +17,13 @@ exports.aliases = ["gf", "gar"];
  */
 exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
+
+    if (new Date().getMonth() === 3 && new Date().getDate() === 1) {
+        msg.channel.send({ files: ["https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/1978/1978-07-27.gif"]});
+        msg.channel.stopTyping();
+        return;
+    }
+
     if (args.length === 0) {
         msg.channel.send({ files: [garfield.random()] }).catch(() => msg.channel.send("Failed to get random comic!"));
         msg.channel.stopTyping();
