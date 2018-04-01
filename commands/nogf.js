@@ -13,10 +13,10 @@ exports.help = {
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg) => {
+exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
 
-    if (new Date().getMonth() === 3 && new Date().getDate() === 1) {
+    if (args[0]) {
         msg.channel.send({ files: ["./nogf.png"]});
         msg.channel.stopTyping();
         return;
