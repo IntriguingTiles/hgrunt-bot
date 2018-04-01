@@ -12,7 +12,7 @@ exports.help = {
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (args.length <= 0) return msg.channel.send(`\`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
+    if (args.length <= 0) return msg.channel.send(`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
 
     hdtf(msg, args, "./hdtf/banner2.png");
 };
