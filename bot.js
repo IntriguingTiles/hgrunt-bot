@@ -32,8 +32,23 @@ client.on("ready", () => {
     client.loadCommands();
     client.user.setActivity("!help");
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
-    // now that the prefix could change on a per-guild basis, what do we do here? :thinking:
-    // for now, we'll leave it as the default prefix.
+});
+
+client.on("guildBanAdd", async (guild, user) => {
+    if (guild.id !== "154305477323390976") return;
+    const auditLog = (await guild.fetchAuditLogs({ type: Discord.GuildAuditLogs.Actions.MEMBER_BAN_ADD })).entries.first(); // potential race condition here
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Banned", user.displayAvatarURL);
+    embed.setThumbnail(user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${user} ${user.tag}`, true);
+    embed.addField("Banned by", `${auditLog.executor} ${auditLog.executor.tag}`, true);
+    embed.setTimestamp();
+    embed.setFooter(`ID: ${user.id}`);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+
+    client.channels.get("154637540341710848").send({ embed });
 });
 
 client.on("guildCreate", async guild => {
