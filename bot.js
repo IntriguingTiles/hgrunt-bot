@@ -36,7 +36,18 @@ client.on("ready", () => {
 
 client.on("guildBanAdd", async (guild, user) => {
     if (guild.id !== "154305477323390976") return;
-    const auditLog = (await guild.fetchAuditLogs({ type: Discord.GuildAuditLogs.Actions.MEMBER_BAN_ADD })).entries.first(); // potential race condition here
+    const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
+    // waiting a second or so should prevent it from ever happening, if it even can happen.
+
+    if (auditLog.action !== Discord.GuildAuditLogs.Actions.MEMBER_BAN_ADD) {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
+        return;
+    }
+
+    if (auditLog.target.id !== user.id) {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
+        return;
+    }
 
     const embed = new Discord.RichEmbed();
     embed.setAuthor("Member Banned", user.displayAvatarURL);
@@ -44,9 +55,30 @@ client.on("guildBanAdd", async (guild, user) => {
     embed.setColor(0xFF470F);
     embed.addField("Member", `${user} ${user.tag}`, true);
     embed.addField("Banned by", `${auditLog.executor} ${auditLog.executor.tag}`, true);
-    embed.setTimestamp();
-    embed.setFooter(`ID: ${user.id}`);
     if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${user.id}`);
+
+    client.channels.get("154637540341710848").send({ embed });
+});
+
+client.on("guildMemberRemove", async member => {
+    if (member.guild.id !== "154305477323390976") return;
+    const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
+
+    if (auditLog.action !== Discord.GuildAuditLogs.Actions.MEMBER_KICK) return;
+
+    if (auditLog.target.id !== member.user.id) return;
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
+    embed.setThumbnail(member.user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${member.user} ${member.user.tag}`, true);
+    embed.addField("Kicked by", `${auditLog.executor} ${auditLog.executor.tag}`, true);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${member.user.id}`);
 
     client.channels.get("154637540341710848").send({ embed });
 });
