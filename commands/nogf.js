@@ -8,6 +8,8 @@ exports.help = {
     info: "Jon is a broken man"
 };
 
+exports.aliases = ["igmg"];
+
 /**
  * @param {Client} client
  * @param {Message} msg

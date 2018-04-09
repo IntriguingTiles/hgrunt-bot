@@ -61,6 +61,9 @@ typings/
 hgrunt/
 vox/
 
+# Garfield Minus Garfield comics
+gmg/
+
 # This is our log file
 no_line.txt
 
