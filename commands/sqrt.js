@@ -1,4 +1,4 @@
-const request = require("request");
+const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
@@ -25,40 +25,27 @@ exports.run = async (client, msg, args) => {
         url += "/garfield/"; // no args -> latest
         sendComic(url, msg);
     } else {
-        request("http://www.mezzacotta.net/garfield/archive.php", function (err, response, html) {
-            if (!err) {
-                const $ = cheerio.load(html);
-                const comic = $("a").filter(function () { return $(this).text().trim() === args[0]; }).first().attr("href"); //eslint-disable-line brace-style
-                if (!comic) {
-                    msg.channel.send("No comic was found for `" + args[0] + "` - check the date format (YYYY-MM-DD)");
-                    msg.channel.stopTyping();
-                    return;
-                }
-                url += comic;
-                sendComic(url, msg);
-            } else {
-                msg.channel.send("An error has occured!");
-                msg.channel.stopTyping();
-                console.error(err);
-                return;
-            }
-        });
+        const html = (await snekfetch.get("http://www.mezzacotta.net/garfield/archive.php")).text;
+        const $ = cheerio.load(html);
+        const comic = $("a").filter(function () { return $(this).text().trim() === args[0]; }).first().attr("href"); //eslint-disable-line brace-style
+
+        if (!comic) {
+            msg.channel.send("No comic was found for `" + args[0] + "` - check the date format (YYYY-MM-DD)");
+            msg.channel.stopTyping();
+            return;
+        }
+
+        url += comic;
+        sendComic(url, msg);
     }
 };
 
-function sendComic(url, msg) {
-    request(url, function (err, response, html) {
-        if (!err) {
-            const $ = cheerio.load(html);
+async function sendComic(url, msg) {
+    const html = (await snekfetch.get(url)).text;
+    const $ = cheerio.load(html);
 
-            const img = "http://www.mezzacotta.net/" + $("img").eq(1).attr("src");
+    const img = "http://www.mezzacotta.net/" + $("img").eq(1).attr("src");
 
-            msg.channel.send({ files: [img] });
-            msg.channel.stopTyping();
-        } else {
-            msg.channel.send("An error has occured!");
-            msg.channel.stopTyping();
-            console.error(err);
-        }
-    });
+    msg.channel.send({ files: [img] });
+    msg.channel.stopTyping();
 }

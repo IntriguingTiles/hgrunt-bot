@@ -1,4 +1,4 @@
-const request = require("request");
+const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
@@ -24,18 +24,10 @@ exports.run = async (client, msg, args) => {
         return;
     }
 
-    request("http://garfield.zweistein.cz/", function (err, response, html) {
-        if (!err) {
-            const $ = cheerio.load(html);
+    const html = (await snekfetch.get("http://garfield.zweistein.cz/")).text;
+    const $ = cheerio.load(html);
+    const img = "http://garfield.zweistein.cz/" + $("img").first().attr("src");
 
-            const img = "http://garfield.zweistein.cz/" + $("img").first().attr("src");
-
-            msg.channel.send({ files: [img] });
-            msg.channel.stopTyping();
-        } else {
-            msg.channel.send("An error has occured!");
-            msg.channel.stopTyping();
-            console.error(err);
-        }
-    });
+    msg.channel.send({ files: [img] });
+    msg.channel.stopTyping();
 };

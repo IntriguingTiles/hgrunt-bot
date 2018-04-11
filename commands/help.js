@@ -40,6 +40,10 @@ exports.run = async (client, msg, args) => {
         for (let i = 0; i < commands.length; i++) {
             if (require(`../commands/${commands[i]}`).help) {
                 final += prefix + commands[i].replace(".js", "") + "\n";
+
+                if (require(`../commands/${commands[i]}`).aliases) {
+                    final += prefix + require(`../commands/${commands[i]}`).aliases.join("\n" + prefix) + "\n";
+                }
             }
         }
         final += `\`\`\`\nTo get more info about a command, use \`${prefix}help [command]\``;
