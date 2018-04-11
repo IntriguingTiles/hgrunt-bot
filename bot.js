@@ -112,7 +112,7 @@ client.on("message", async msg => {
 
     if (!guildSettings) {
         client.guildSettings.set(msg.guild.id, defaultSettings);
-        guildSettings = client.guildSettigns.get(msg.guild.id);
+        guildSettings = client.guildSettings.get(msg.guild.id);
     }
 
     if (!msg.content.startsWith(guildSettings.prefix)) return;
