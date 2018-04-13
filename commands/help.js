@@ -16,8 +16,8 @@ exports.help = {
  */
 exports.run = async (client, msg, args) => {
     const prefix = client.guildSettings.get(msg.guild.id).prefix;
-    const search = args[0].replace(prefix, "");
     if (args.length >= 1) {
+        const search = args[0].replace(prefix, "");
         for (let i = 0; i < commands.length; i++) {
             const cmd = require(`../commands/${commands[i]}`);
             if ((commands[i].startsWith(search) || (cmd.aliases ? cmd.aliases.includes(search) : false)) && cmd.help) {
