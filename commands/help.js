@@ -16,9 +16,11 @@ exports.help = {
  */
 exports.run = async (client, msg, args) => {
     const prefix = client.guildSettings.get(msg.guild.id).prefix;
+    const search = args[0].replace(prefix, "");
     if (args.length >= 1) {
         for (let i = 0; i < commands.length; i++) {
-            if (commands[i].startsWith(args[0].replace(prefix, "")) && require(`../commands/${commands[i]}`).help) {
+            const cmd = require(`../commands/${commands[i]}`);
+            if ((commands[i].startsWith(search) || (cmd.aliases ? cmd.aliases.includes(search) : false)) && cmd.help) {
                 const cmd = require(`../commands/${commands[i]}`);
                 let helpText;
                 if (cmd.aliases) {
@@ -41,7 +43,7 @@ exports.run = async (client, msg, args) => {
             const cmd = require(`../commands/${commands[i]}`);
             if (cmd.help) {
                 if (cmd.aliases) {
-                    final += `${prefix}${commands[i].replace(".js", "")} (Aliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)})\n`;
+                    final += `${prefix}${commands[i].replace(".js", "")} (aliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)})\n`;
                 } else {
                     final += `${prefix}${commands[i].replace(".js", "")}\n`;
                 }
