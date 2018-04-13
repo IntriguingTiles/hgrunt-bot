@@ -38,11 +38,12 @@ exports.run = async (client, msg, args) => {
         let final = "Commands list: \n```\n";
 
         for (let i = 0; i < commands.length; i++) {
-            if (require(`../commands/${commands[i]}`).help) {
-                final += prefix + commands[i].replace(".js", "") + "\n";
-
-                if (require(`../commands/${commands[i]}`).aliases) {
-                    final += prefix + require(`../commands/${commands[i]}`).aliases.join("\n" + prefix) + "\n";
+            const cmd = require(`../commands/${commands[i]}`);
+            if (cmd.help) {
+                if (cmd.aliases) {
+                    final += `${prefix}${commands[i].replace(".js", "")} (Aliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)})\n`;
+                } else {
+                    final += `${prefix}${commands[i].replace(".js", "")}\n`;
                 }
             }
         }
