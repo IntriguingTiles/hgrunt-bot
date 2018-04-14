@@ -5,6 +5,7 @@ const Enmap = require("enmap");
 const EnmapLevel = require("enmap-level");
 const Cleverbot = require("cleverbot-node");
 const express = require("express");
+const sleep = require("util").promisify(setTimeout);
 
 const server = express();
 
@@ -36,6 +37,7 @@ client.on("ready", () => {
 
 client.on("guildBanAdd", async (guild, user) => {
     if (guild.id !== "154305477323390976") return;
+    await sleep(3000);
     const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
     // waiting a second or so should prevent it from ever happening, if it even can happen.
 
@@ -64,6 +66,7 @@ client.on("guildBanAdd", async (guild, user) => {
 
 client.on("guildMemberRemove", async member => {
     if (member.guild.id !== "154305477323390976") return;
+    await sleep(3000);
     const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
 
     if (auditLog.action !== Discord.GuildAuditLogs.Actions.MEMBER_KICK) return;
