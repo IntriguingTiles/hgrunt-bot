@@ -41,7 +41,7 @@ client.on("guildBanAdd", async (guild, user) => {
     const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
     // waiting a second or so should prevent it from ever happening, if it even can happen.
 
-    if (auditLog.action !== Discord.GuildAuditLogs.Actions.MEMBER_BAN_ADD) {
+    if (auditLog.action !== "MEMBER_BAN_ADD") {
         client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
         return;
     }
@@ -69,7 +69,7 @@ client.on("guildMemberRemove", async member => {
     await sleep(3000);
     const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
 
-    if (auditLog.action !== Discord.GuildAuditLogs.Actions.MEMBER_KICK) return;
+    if (auditLog.action !== "MEMBER_KICK") return;
 
     if (auditLog.target.id !== member.user.id) return;
 
