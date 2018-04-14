@@ -51,6 +51,8 @@ client.on("guildBanAdd", async (guild, user) => {
         return;
     }
 
+    if (auditLog.executor.id === "155149108183695360") return;
+
     const embed = new Discord.RichEmbed();
     embed.setAuthor("Member Banned", user.displayAvatarURL);
     embed.setThumbnail(user.displayAvatarURL);
