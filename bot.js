@@ -97,7 +97,8 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type !== "text") return; // only do things in a text channel
+    if (msg.channel.type !== "text") return; // only do things in a text 
+    if (msg.channel.id === "435140452333781002" && msg.author.id !== "167490818658140160") msg.delete();
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
