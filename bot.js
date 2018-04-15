@@ -57,8 +57,8 @@ client.on("guildBanAdd", async (guild, user) => {
     embed.setAuthor("Member Banned", user.displayAvatarURL);
     embed.setThumbnail(user.displayAvatarURL);
     embed.setColor(0xFF470F);
-    embed.addField("Member", `${user} ${user.tag}`, true);
-    embed.addField("Banned by", `${auditLog.executor} ${auditLog.executor.tag}`, true);
+    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
+    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
     if (auditLog.reason) embed.addField("Reason", auditLog.reason);
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${user.id}`);
@@ -79,8 +79,8 @@ client.on("guildMemberRemove", async member => {
     embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
     embed.setThumbnail(member.user.displayAvatarURL);
     embed.setColor(0xFF470F);
-    embed.addField("Member", `${member.user} ${member.user.tag}`, true);
-    embed.addField("Kicked by", `${auditLog.executor} ${auditLog.executor.tag}`, true);
+    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
+    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
     if (auditLog.reason) embed.addField("Reason", auditLog.reason);
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${member.user.id}`);
