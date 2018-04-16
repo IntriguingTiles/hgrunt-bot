@@ -97,8 +97,7 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type !== "text") return; // only do things in a text 
-    if (msg.channel.id === "435140452333781002" && msg.author.id !== "167490818658140160") msg.delete();
+    if (msg.channel.type !== "text") return; // only do things in a text channel
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
@@ -127,6 +126,12 @@ client.on("message", async msg => {
     const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
 
     if (cmd in client.commands) {
+        if (client.commands[cmd].requiredPermissions) {
+            const perms = client.commands[cmd].requiredPermissions;
+            for (let i = 0; i < perms.length; i++) {
+                if (!msg.channel.permissionsFor(client.user).has(perms[i])) return msg.channel.send(`I need permission to \`${perms[i]}\` for that command!`);
+            }
+        }
         client.commands[cmd].run(client, msg, args);
     }
 });

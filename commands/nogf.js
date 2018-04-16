@@ -8,6 +8,8 @@ exports.help = {
     info: "Jon is a broken man"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 exports.aliases = ["igmg"];
 
 /**

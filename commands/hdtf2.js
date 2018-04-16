@@ -6,6 +6,8 @@ exports.help = {
     info: "Generates a HDTF banner"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 /**
  * @param {Client} client
  * @param {Message} msg

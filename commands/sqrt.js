@@ -8,6 +8,8 @@ exports.help = {
     info: "Square Root of Minus Garfield"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 /**
  * @param {Client} client
  * @param {Message} msg

@@ -6,6 +6,8 @@ exports.help = {
     info: "GARFIELD!!"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 /**
  * @param {Client} client
  * @param {Message} msg

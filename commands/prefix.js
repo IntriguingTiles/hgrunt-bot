@@ -20,7 +20,7 @@ exports.run = async (client, msg, args) => {
 
         client.guildSettings.set(msg.guild.id, guildSettings);
 
-        msg.channel.send(`The prefix has been succesfully updated to \`${guildSettings.prefix}\`!`);
+        msg.channel.send(`The prefix has been successfully updated to \`${guildSettings.prefix}\`!`);
     } else {
         msg.reply("You need to have the `Manage Server` permission to use this command!");
     }

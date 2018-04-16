@@ -8,6 +8,8 @@ exports.help = {
     info: "Now where could my pipe be?"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 exports.aliases = ["gf", "gar"];
 
 /**
