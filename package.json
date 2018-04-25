@@ -19,7 +19,6 @@
   "dependencies": {
     "bufferutil": "^3.0.4",
     "cheerio": "^1.0.0-rc.2",
-    "cleverbot-node": "^0.3.11",
     "discord.js": "^11.3.2",
     "dotenv": "^5.0.1",
     "enmap": "^2.1.1",

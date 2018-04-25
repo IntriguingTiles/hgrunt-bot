@@ -9,7 +9,14 @@ module.exports = class Cleverbot {
     constructor(user, key) {
         this.user = user;
         this.key = key;
-        create();
+        this.create();
+    }
+
+    // epic way to let me use await in the constructor but not really
+    async create() {
+        const response = (await snekfetch.post("https://cleverbot.io/1.0/create").set("Content-Type", "application/x-www-form-urlencoded").send({ user: this.user, key: this.key })).body;
+        if (response.status !== "success") throw new Error(`Failed to create a cleverbot instance! ${response.status}`);
+        this.nick = response.nick;
     }
 
     /**
@@ -22,10 +29,3 @@ module.exports = class Cleverbot {
         return response.response; // incredible
     }
 };
-
-// epic way to let me use await in the constructor but not really
-async function create() {
-    const response = (await snekfetch.post("https://cleverbot.io/1.0/create").set("Content-Type", "application/x-www-form-urlencoded").send({ user: this.user, key: this.key })).body;
-    if (response.status !== "success") throw new Error(`Failed to create a cleverbot instance! ${response.status}`);
-    this.nick = response.nick;
-}
