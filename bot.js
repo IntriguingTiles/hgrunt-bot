@@ -3,14 +3,13 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const Enmap = require("enmap");
 const EnmapLevel = require("enmap-level");
-const Cleverbot = require("cleverbot-node");
+const Cleverbot = require("./utils/cleverbot.js");
 const express = require("express");
 const sleep = require("util").promisify(setTimeout);
 
 const server = express();
 
-const cleverbot = new Cleverbot;
-cleverbot.configure({ botapi: process.env.CB_KEY });
+const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
 
 const client = new Discord.Client({ disableEveryone: true });
 client.guildSettings = new Enmap({ provider: new EnmapLevel({ name: "guildSettings" }) });
@@ -102,12 +101,13 @@ client.on("message", async msg => {
 
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
-        msg.channel.startTyping();
-        cleverbot.write(msg.content.replace(prefixMention, ""), response => {
-            msg.channel.stopTyping();
-            msg.channel.send(`${msg.author} ${response.output}`).catch(console.error);
-            if (msg.author.bot) client.mSent++;
-        });
+
+        msg.channel.startTyping();        
+        const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));        
+        msg.channel.send(`${msg.author} ${response}`);
+        msg.channel.stopTyping();
+
+        if (msg.author.bot) client.mSent++;
         return;
     }
 
