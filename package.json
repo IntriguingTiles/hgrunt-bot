@@ -27,13 +27,13 @@
     "express": "^4.16.3",
     "garfield": "^1.1.2",
     "jimp": "^0.2.28",
-    "moment": "^2.22.0",
+    "moment": "^2.22.1",
     "moment-duration-format": "^2.2.2",
     "node-opus": "^0.2.7",
     "simple-git": "^1.92.0",
-    "snekfetch": "^3.6.4",
+    "snekfetch": "^4.0.0",
     "sodium": "github:general-programming/node-sodium",
-    "uws": "^9.14.0"
+    "uws": "^9.148.0"
   },
   "devDependencies": {}
 }
