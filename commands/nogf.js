@@ -26,7 +26,12 @@ exports.run = async (client, msg, args) => {
         return;
     }
 
-    const html = (await snekfetch.get("http://garfield.zweistein.cz/")).text;
+    const html = (await snekfetch.get("http://garfield.zweistein.cz/")).body;
+    if (!html) {
+        msg.channel.send("Failed to get comic!");
+        msg.channel.stopTyping();
+    }
+
     const $ = cheerio.load(html);
     const img = "http://garfield.zweistein.cz/" + $("img").first().attr("src");
 

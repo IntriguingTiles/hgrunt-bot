@@ -27,7 +27,7 @@ exports.run = async (client, msg, args) => {
         url += "/garfield/"; // no args -> latest
         sendComic(url, msg);
     } else {
-        const html = (await snekfetch.get("http://www.mezzacotta.net/garfield/archive.php")).text;
+        const html = (await snekfetch.get("http://www.mezzacotta.net/garfield/archive.php")).body;
         const $ = cheerio.load(html);
         const comic = $("a").filter(function () { return $(this).text().trim() === args[0]; }).first().attr("href"); //eslint-disable-line brace-style
 
@@ -43,9 +43,13 @@ exports.run = async (client, msg, args) => {
 };
 
 async function sendComic(url, msg) {
-    const html = (await snekfetch.get(url)).text;
-    const $ = cheerio.load(html);
+    const html = (await snekfetch.get(url)).body;
+    if (!html) {
+        msg.channel.send("Failed to get comic!");
+        msg.channel.stopTyping();
+    }
 
+    const $ = cheerio.load(html);
     const img = "http://www.mezzacotta.net/" + $("img").eq(1).attr("src");
 
     msg.channel.send({ files: [img] });
