@@ -22,7 +22,7 @@ exports.run = async (client, msg, args) => {
     if (args.length > 0) {
         // use the mediawiki api to search for an article
         const search = encodeURIComponent(args.join(" "));
-        const results = (await snekfetch.get(`https://www.wikihow.com/api.php?action=titlesearch&q=${search}&format=json`)).body; // gives us json we can work with
+        const results = (await snekfetch.get(`https://www.wikihow.com/api.php?action=titlesearch&q=${search}&safeSearch=0&format=json`)).body; // gives us json we can work with
 
         if (!results.data[0]) {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
