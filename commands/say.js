@@ -19,6 +19,8 @@ exports.help = {
     info: "Speaks words in a voice channel"
 };
 
+exports.requiredPermissions = ["ADD_REACTIONS"];
+
 /**
  * @param {Client} client
  * @param {Message} msg
