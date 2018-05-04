@@ -24,8 +24,14 @@ module.exports = class Cleverbot {
      * @param {string} text 
      */
     async ask(text) {
-        const response = (await snekfetch.post("https://cleverbot.io/1.0/ask").set("Content-Type", "application/x-www-form-urlencoded").send({ user: this.user, key: this.key, nick: this.nick, text: text })).body;
-        if (response.status !== "success") throw new Error(`Failed to get a response from cleverbot! ${response.status}`);
-        return response.response; // incredible
+        let responseText;
+
+        while (!responseText) { // keep trying until we get a response
+            const response = (await snekfetch.post("https://cleverbot.io/1.0/ask").set("Content-Type", "application/x-www-form-urlencoded").send({ user: this.user, key: this.key, nick: this.nick, text: text })).body;
+            if (response.status !== "success") throw new Error(`Failed to get a response from cleverbot! ${response.status}`);
+            responseText = response.response;
+        }
+
+        return responseText;
     }
 };
