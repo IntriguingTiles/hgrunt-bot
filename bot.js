@@ -195,6 +195,12 @@ client.loadCommands = () => {
     console.log(`Loaded ${commands.length} commands!`);
 };
 
+process.on("SIGINT", async () => {
+    client.guildSettings.db.close();
+    await client.destroy();
+    process.exit(0);
+});
+
 // very ugly express inline html stuff below
 server.get("/", (req, res) => {
     let final = `<h1>HGrunt Stats</h1>
