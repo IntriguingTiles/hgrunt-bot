@@ -6,6 +6,7 @@ exports.help = {
     info: "Configure the prefix for command and disable commands."
 };
 
+const blacklist = /eval|config/g;
 
 /**
  * Don't think too hard. This command is kind of difficult to follow.
@@ -31,8 +32,7 @@ exports.run = async (client, msg, args) => {
             if (args[1] === "disable") {
                 if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });
 
-                if (args[2].replace(guildSettings.prefix, "") === "eval" || args[2].replace(guildSettings.prefix, "") === "config"
-                    || args[3].replace(guildSettings.prefix, "") === "eval" || args[3].replace(guildSettings.prefix, "") === "config") return msg.channel.send("You can't disable that command!");
+                if (blacklist.test(args[2] || blacklist.test(args[3]))) return msg.channel.send("You can't disable that command!");
 
                 if (args[2] === "server") {
                     // disable command for the entire guild
