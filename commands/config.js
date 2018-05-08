@@ -3,7 +3,7 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "config",
     usage: "config <prefix|cmd> <args>",
-    info: "HGrunt configuration."
+    info: "Configure the prefix for command and disable commands."
 };
 
 
@@ -31,13 +31,14 @@ exports.run = async (client, msg, args) => {
             if (args[1] === "disable") {
                 if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });
 
-                if (args[2] === "eval" || args[2] === "config" || args[3] === "eval" || args[3] === "config") return msg.channel.send("You can't disable that command!");
+                if (args[2].replace(guildSettings.prefix, "") === "eval" || args[2].replace(guildSettings.prefix, "") === "config"
+                    || args[3].replace(guildSettings.prefix, "") === "eval" || args[3].replace(guildSettings.prefix, "") === "config") return msg.channel.send("You can't disable that command!");
 
                 if (args[2] === "server") {
                     // disable command for the entire guild
                     if (args.length < 4) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });
 
-                    let realCmd = args[3];
+                    let realCmd = args[3].replace(guildSettings.prefix, "");
 
                     if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
                     if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
@@ -53,7 +54,7 @@ exports.run = async (client, msg, args) => {
 
                     return msg.channel.send("Command successfully disabled server-wide!");
                 } else {
-                    let realCmd = args[2];
+                    let realCmd = args[2].replace(guildSettings.prefix, "");
 
                     if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
                     if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
@@ -72,7 +73,7 @@ exports.run = async (client, msg, args) => {
             } else if (args[1] === "enable") {
                 if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd enable <cmd>`, { code: "" });
 
-                let realCmd = args[2];
+                let realCmd = args[2].replace(guildSettings.prefix, "");
 
                 if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
                 if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
