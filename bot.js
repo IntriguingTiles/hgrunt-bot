@@ -20,7 +20,8 @@ let prefixMention;
 
 const defaultSettings = {
     prefix: "!", // command prefix
-    limits: true // should we enable limits
+    limits: true, // should we enable limits
+    disabledCommands: [] // array of {command: string, channels: []}. if channels is empty, then the command is disabled for the guild
 };
 
 client.login(process.env.DISCORD_TOKEN);
@@ -102,8 +103,8 @@ client.on("message", async msg => {
     if (prefixMention.test(msg.content)) {
         if (msg.author.bot && client.mSent >= 100) return;
 
-        msg.channel.startTyping();        
-        const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));        
+        msg.channel.startTyping();
+        const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
         msg.channel.send(`${msg.author} ${response}`);
         msg.channel.stopTyping();
 
@@ -126,12 +127,45 @@ client.on("message", async msg => {
     const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
 
     if (cmd in client.commands) {
+        // checking permissions
         if (client.commands[cmd].requiredPermissions) {
             const perms = client.commands[cmd].requiredPermissions;
             for (let i = 0; i < perms.length; i++) {
                 if (!msg.channel.permissionsFor(client.user).has(perms[i])) return msg.channel.send(`I need permission to \`${perms[i]}\` for that command!`);
             }
         }
+
+        // checking disabled commands
+        if (guildSettings.disabledCommands.length > 0) {
+            for (let i = 0; i < guildSettings.disabledCommands.length; i++) {
+                const disabledCommand = guildSettings.disabledCommands[i];
+
+                // remember, the structure for disabledCommand looks like this: {command: string, channels: []}
+                // channels can be empty
+
+                if (disabledCommand.channels.length > 0) {
+                    // this command is disabled in one or more channels
+                    for (let j = 0; j < disabledCommand.channels.length; j++) {
+                        if (disabledCommand.channels[j] !== msg.channel.id) continue;
+
+                        if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled in this channel!");
+
+                        if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                            if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled in this channel!");
+                        }
+                    }
+                } else {
+                    // this command is disabled for the guild
+                    if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled!");
+
+                    if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                        if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled!");
+                    }
+                }
+            }
+        }
+
+        // finally run the command
         client.commands[cmd].run(client, msg, args);
     }
 });

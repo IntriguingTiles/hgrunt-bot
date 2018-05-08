@@ -24,13 +24,12 @@ exports.run = async (client, msg, args) => {
                 const cmd = require(`../commands/${commands[i]}`);
                 let helpText;
                 if (cmd.aliases) {
-                    helpText = `\`\`\`\nCommand: ${prefix}${cmd.help.name}\nAliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
+                    helpText = `\nCommand: ${prefix}${cmd.help.name}\nAliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
                 } else {
-                    helpText = `\`\`\`\nCommand: ${prefix}${cmd.help.name}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
+                    helpText = `\nCommand: ${prefix}${cmd.help.name}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
                 }
 
-                helpText += "```";
-                msg.channel.send(helpText);
+                msg.channel.send(helpText, {code: ""});
                 return;
             }
         }

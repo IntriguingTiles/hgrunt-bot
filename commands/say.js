@@ -72,7 +72,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
 
         if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
             msg.react("❌");
-            msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use ${guildSettings.prefix}limits to disable the limits.`);
+            msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}limits\` to disable the limits.`);
             return;
         }
 

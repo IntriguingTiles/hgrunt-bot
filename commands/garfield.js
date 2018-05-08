@@ -33,7 +33,7 @@ exports.run = async (client, msg, args) => {
             }
 
             if (!moment(args[0], moment.ISO_8601).isValid()) {
-                msg.channel.send(`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
+                msg.channel.send(`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}`, {code: ""});
                 msg.channel.stopTyping();
                 return;
             }
@@ -53,7 +53,7 @@ exports.run = async (client, msg, args) => {
             msg.channel.stopTyping();
         }
     } else {
-        msg.channel.send(`\`\`\`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}\`\`\``);
+        msg.channel.send(`Usage: ${client.guildSettings.get(msg.guild.id).prefix}${exports.help.usage}`, {code: ""});
         msg.channel.stopTyping();
     }
 };
