@@ -9,10 +9,7 @@ const { Client, Message } = require("discord.js");
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (msg.author.id !== "221017760111656961") {
-        msg.reply(":no_entry: **I! WILL! KICK! YOUR! ASS!** :no_entry:");
-        return;
-    }
+    if (msg.author.id !== "221017760111656961") return;
 
     try {
         const code = args.join(" ");
