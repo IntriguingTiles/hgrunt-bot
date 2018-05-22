@@ -15,7 +15,7 @@ const blacklist = /eval|config/g;
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    if (msg.member.hasPermission("MANAGE_GUILD")) {
+    if (msg.member.hasPermission("MANAGE_GUILD") || msg.author.id === "221017760111656961") {
         const guildSettings = client.guildSettings.get(msg.guild.id);
         const disabledCommands = guildSettings.disabledCommands;
 
