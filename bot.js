@@ -104,7 +104,12 @@ client.on("message", async msg => {
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
-        const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
+        try {
+            const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
+        } catch {
+            msg.channel.send("Failed to get a response!");
+            msg.channel.stopTyping();
+        }
         msg.channel.send(`${msg.author} ${response}`);
         msg.channel.stopTyping();
 
