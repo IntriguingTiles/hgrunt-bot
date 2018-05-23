@@ -20,10 +20,9 @@ exports.aliases = ["af"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    // here's how this will work:
-    // first we will always request a token
-    // then we use that token for the rest of the requests
-    if (args.length < 1) return msg.channel.send("usage message here");
+    const guildSettings = client.guildSettings.get(msg.guild.id);
+    
+    if (args.length < 1) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
 
     if (args[0] === "list" && args.length === 1) {
         // print template list
