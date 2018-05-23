@@ -48,8 +48,8 @@ exports.run = async (client, msg, args) => {
     // make video
     let template;
 
-    if (templates.filter(t => t.filename === args[0].toLowerCase()).length > 0) {
-        template = templates.filter(t => t.filename === (args[0].toLowerCase()))[0];
+    if (templates.filter(t => t.filename.toLowerCase() === args[0].toLowerCase()).length > 0) {
+        template = templates.filter(t => t.filename.toLowerCase() === (args[0].toLowerCase()))[0];
         args.shift();
     } else template = templates[Math.floor(Math.random() * templates.length)];
 
