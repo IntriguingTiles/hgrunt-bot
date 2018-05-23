@@ -21,7 +21,7 @@ exports.aliases = ["af"];
  */
 exports.run = async (client, msg, args) => {
     const guildSettings = client.guildSettings.get(msg.guild.id);
-    
+
     if (args.length < 1) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
 
     if (args[0] === "list" && args.length === 1) {
@@ -54,16 +54,21 @@ exports.run = async (client, msg, args) => {
     } else template = templates[Math.floor(Math.random() * templates.length)];
 
     const fontSize = getFontSize(args.join(" "));
-    const videoID = await store(token, cookies, args.join(" "), fontSize, template.templateID);
+    try {
+        const videoID = await store(token, cookies, args.join(" "), fontSize, template.templateID);
 
-    // now we just need to wait until the video is created
-    while (true) { // eslint-disable-line no-constant-condition
-        await sleep(5000); // sleep 5 seconds
-        const status = await videoStatus(token, cookies, videoID).catch(); // either is nothing or the video url
-        if (!status) continue; // video not done yet
+        // now we just need to wait until the video is created
+        while (true) { // eslint-disable-line no-constant-condition
+            await sleep(5000); // sleep 5 seconds
+            const status = await videoStatus(token, cookies, videoID).catch(); // either is nothing or the video url
+            if (!status) continue; // video not done yet
+            m.delete();
+            msg.channel.send(`${msg.author} ${status}`); // video done, send the url
+            return;
+        }
+    } catch (err) {
         m.delete();
-        msg.channel.send(`${msg.author} ${status}`); // video done, send the url
-        return;
+        msg.channel.send("Failed to get a video ID. Usually a problem with your text.");
     }
 };
 
