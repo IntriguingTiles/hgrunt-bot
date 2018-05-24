@@ -68,7 +68,7 @@ exports.run = async (client, msg, args) => {
         }
     } catch (err) {
         m.delete();
-        msg.channel.send("Failed to get a video ID. Usually a problem with your text.");
+        msg.channel.send("Failed to get a video ID. Usually a problem with your input.");
     }
 };
 
@@ -92,6 +92,8 @@ async function store(token, cookie, text, fontSize, templateID) {
 
     const filename = videoInfo.filename;
     const animation = videoInfo.animation;
+
+    console.log(filename, animation, fontSize);
 
     const r = (await snekfetch.post(`${baseURL}/store`).set(
         { "Content-Type": "application/x-www-form-urlencoded", "x-authorizationtoken": token, cookie }).send(
