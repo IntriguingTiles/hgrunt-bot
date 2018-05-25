@@ -93,8 +93,6 @@ async function store(token, cookie, text, fontSize, templateID) {
     const filename = videoInfo.filename;
     const animation = videoInfo.animation;
 
-    console.log(filename, animation, fontSize);
-
     const r = (await snekfetch.post(`${baseURL}/store`).set(
         { "Content-Type": "application/x-www-form-urlencoded", "x-authorizationtoken": token, cookie }).send(
             { text, locale: "en-gb", filename, animation, templateID, fontSize })).body;
