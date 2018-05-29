@@ -35,59 +35,6 @@ client.on("ready", () => {
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
 });
 
-client.on("guildBanAdd", async (guild, user) => {
-    if (guild.id !== "154305477323390976") return;
-    await sleep(3000);
-    const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
-    // waiting a second or so should prevent it from ever happening, if it even can happen.
-
-    if (auditLog.action !== "MEMBER_BAN_ADD") {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
-        return;
-    }
-
-    if (auditLog.target.id !== user.id) {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
-        return;
-    }
-
-    if (auditLog.executor.id === "155149108183695360") return;
-
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Banned", user.displayAvatarURL);
-    embed.setThumbnail(user.displayAvatarURL);
-    embed.setColor(0xFF470F);
-    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
-    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
-    embed.setTimestamp(auditLog.createdAt);
-    embed.setFooter(`ID: ${user.id}`);
-
-    client.channels.get("154637540341710848").send({ embed });
-});
-
-client.on("guildMemberRemove", async member => {
-    if (member.guild.id !== "154305477323390976") return;
-    await sleep(3000);
-    const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
-
-    if (auditLog.action !== "MEMBER_KICK") return;
-
-    if (auditLog.target.id !== member.user.id) return;
-
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
-    embed.setThumbnail(member.user.displayAvatarURL);
-    embed.setColor(0xFF470F);
-    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
-    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
-    embed.setTimestamp(auditLog.createdAt);
-    embed.setFooter(`ID: ${member.user.id}`);
-
-    client.channels.get("154637540341710848").send({ embed });
-});
-
 client.on("guildCreate", async guild => {
     client.guildSettings.set(guild.id, defaultSettings);
 });
@@ -180,6 +127,59 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
     if (newMember.guild.voiceConnection) {
         if (newMember.guild.voiceConnection.channel.members.size === 1 && newMember.guild.voiceConnection.channel.members.first() === newMember.guild.me) newMember.guild.voiceConnection.channel.leave();
     }
+});
+
+client.on("guildBanAdd", async (guild, user) => {
+    if (guild.id !== "154305477323390976") return;
+    await sleep(3000);
+    const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
+    // waiting a second or so should prevent it from ever happening, if it even can happen.
+
+    if (auditLog.action !== "MEMBER_BAN_ADD") {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
+        return;
+    }
+
+    if (auditLog.target.id !== user.id) {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
+        return;
+    }
+
+    if (auditLog.executor.id === "155149108183695360") return;
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Banned", user.displayAvatarURL);
+    embed.setThumbnail(user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
+    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${user.id}`);
+
+    client.channels.get("154637540341710848").send({ embed });
+});
+
+client.on("guildMemberRemove", async member => {
+    if (member.guild.id !== "154305477323390976") return;
+    await sleep(3000);
+    const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
+
+    if (auditLog.action !== "MEMBER_KICK") return;
+
+    if (auditLog.target.id !== member.user.id) return;
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
+    embed.setThumbnail(member.user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
+    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${member.user.id}`);
+
+    client.channels.get("154637540341710848").send({ embed });
 });
 
 client.loadCommands = () => {
