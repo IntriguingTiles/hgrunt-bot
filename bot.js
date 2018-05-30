@@ -44,10 +44,24 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type !== "text") return; // only do things in a text channel
+    if (msg.channel.type === "dm") {
+        // respond to DMs but only with cleverbot
+        try {
+            const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
+            
+            msg.channel.send(`${msg.author} ${response}`);
+            msg.channel.stopTyping();
+        } catch (err) {
+            msg.channel.send("Failed to get a response!");
+            msg.channel.stopTyping();
+        }
+        return;
+    }
+    
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
+        // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
