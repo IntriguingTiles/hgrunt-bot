@@ -46,10 +46,11 @@ client.on("guildDelete", async guild => {
 client.on("message", async msg => {
     if (msg.channel.type === "dm") {
         // respond to DMs but only with cleverbot
+        msg.channel.startTyping();
         try {
             const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
             
-            msg.channel.send(`${msg.author} ${response}`);
+            msg.channel.send(`${response}`);
             msg.channel.stopTyping();
         } catch (err) {
             msg.channel.send("Failed to get a response!");
@@ -57,7 +58,7 @@ client.on("message", async msg => {
         }
         return;
     }
-    
+
     if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
