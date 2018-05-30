@@ -2,7 +2,7 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 
 exports.help = {
     name: "config",
-    usage: "config <prefix|cmd> <args>",
+    usage: "config <prefix|cmd|limits> [args]",
     info: "Configure the prefix for command and disable commands."
 };
 
@@ -28,6 +28,15 @@ exports.run = async (client, msg, args) => {
             client.guildSettings.set(msg.guild.id, guildSettings);
 
             msg.channel.send(`The prefix has been successfully updated to \`${guildSettings.prefix}\`!`);
+        } else if (args[0] === "limits") {
+            guildSettings.limits = !guildSettings.limits;
+            client.guildSettings.set(msg.guild.id, guildSettings);
+
+            if (guildSettings.limits) {
+                msg.channel.send("Limits enabled!");
+            } else {
+                msg.channel.send("Limits disabled!");
+            }
         } else if (args[0] === "cmd") {
             if (args[1] === "disable") {
                 if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });
