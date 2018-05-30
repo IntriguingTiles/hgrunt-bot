@@ -44,8 +44,8 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type === "dm") {
-        // respond to DMs but only with cleverbot
+    if (msg.channel.type === "dm" && !msg.author.bot) {
+        // respond to DMs but only with cleverbot and stop us from responding to ourselves
         msg.channel.startTyping();
         try {
             const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
