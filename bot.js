@@ -59,7 +59,7 @@ client.on("message", async msg => {
         return;
     }
 
-    if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
+    if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
         // cleverbot stuff
@@ -104,35 +104,7 @@ client.on("message", async msg => {
         }
 
         // checking disabled commands
-        if (guildSettings.disabledCommands.length > 0) {
-            for (let i = 0; i < guildSettings.disabledCommands.length; i++) {
-                const disabledCommand = guildSettings.disabledCommands[i];
-
-                // remember, the structure for disabledCommand looks like this: {command: string, channels: []}
-                // channels can be empty
-
-                if (disabledCommand.channels.length > 0) {
-                    // this command is disabled in one or more channels
-                    for (let j = 0; j < disabledCommand.channels.length; j++) {
-                        if (disabledCommand.channels[j] !== msg.channel.id) continue;
-
-                        if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled in this channel!");
-
-                        if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
-                            if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled in this channel!");
-                        }
-                    }
-                } else {
-                    // this command is disabled for the guild
-                    if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled!");
-
-                    if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
-                        if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled!");
-                    }
-                }
-            }
-        }
-
+        if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
         // finally run the command
         client.commands[cmd].run(client, msg, args);
     }
@@ -159,8 +131,6 @@ client.on("guildBanAdd", async (guild, user) => {
         client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
         return;
     }
-
-    if (auditLog.executor.id === "155149108183695360") return;
 
     const embed = new Discord.RichEmbed();
     embed.setAuthor("Member Banned", user.displayAvatarURL);
@@ -215,6 +185,37 @@ client.loadCommands = () => {
     }
     console.log(`Loaded ${commands.length} commands!`);
 };
+
+function checkDisabledCommands(cmd, guildSettings, channelID) {
+    if (guildSettings.disabledCommands.length > 0) {
+        for (let i = 0; i < guildSettings.disabledCommands.length; i++) {
+            const disabledCommand = guildSettings.disabledCommands[i];
+
+            // remember, the structure for disabledCommand looks like this: {command: string, channels: []}
+            // channels can be empty
+
+            if (disabledCommand.channels.length > 0) {
+                // this command is disabled in one or more channels
+                for (let j = 0; j < disabledCommand.channels.length; j++) {
+                    if (disabledCommand.channels[j] !== channelID) continue;
+
+                    if (disabledCommand.command === cmd) return true;
+
+                    if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                        if (disabledCommand.command === client.commands[cmd].help.name) return true;
+                    }
+                }
+            } else {
+                // this command is disabled for the guild
+                if (disabledCommand.command === cmd) return true;
+
+                if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                    if (disabledCommand.command === client.commands[cmd].help.name) return true;
+                }
+            }
+        }
+    }
+}
 
 process.on("SIGINT", async () => {
     client.guildSettings.db.close();

@@ -3,6 +3,26 @@ This is a discord.js bot that can play hgrunt/VOX lines in a voice channel, gene
 
 [Add HGrunt](https://discordapp.com/oauth2/authorize/?permissions=3196992&scope=bot&client_id=396884008501510144)
 
+# Support
+Join [HGrunt Hell](https://discord.gg/trWuQMv) or join the Half-Life Discord.
+
+# Running your own instance
+```
+git clone https://github.com/IntriguingTiles/hgrunt-bot.git
+cd hgrunt-bot
+mkdir gmg
+mkdir hgrunt
+mkdir vox
+npm install
+```
+Now just put your token in the `DISCORD_TOKEN` environment variable and you should be good to go.
+
+If you want Cleverbot to work, put your info from [cleverbot.io](https://cleverbot.io/) in `CB_KEY` and `CB_USER`.
+
+If you want `!say` to work, grab the audio files for `hgrunt` and `vox` from Half-Life 1. You'll also need FFmpeg.
+
+If you want `!gmg` to work, you'll have to scrape images from [garfield minus garfield](http://garfieldminusgarfield.net/) and place them in `gmg`.
+
 # Credits
 - Miloteza#7639 for the custom VOX lines
 - HeadCrabbed#1477 for the HDTF character set
