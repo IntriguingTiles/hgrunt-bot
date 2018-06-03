@@ -35,59 +35,6 @@ client.on("ready", () => {
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
 });
 
-client.on("guildBanAdd", async (guild, user) => {
-    if (guild.id !== "154305477323390976") return;
-    await sleep(3000);
-    const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
-    // waiting a second or so should prevent it from ever happening, if it even can happen.
-
-    if (auditLog.action !== "MEMBER_BAN_ADD") {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
-        return;
-    }
-
-    if (auditLog.target.id !== user.id) {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
-        return;
-    }
-
-    if (auditLog.executor.id === "155149108183695360") return;
-
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Banned", user.displayAvatarURL);
-    embed.setThumbnail(user.displayAvatarURL);
-    embed.setColor(0xFF470F);
-    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
-    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
-    embed.setTimestamp(auditLog.createdAt);
-    embed.setFooter(`ID: ${user.id}`);
-
-    client.channels.get("154637540341710848").send({ embed });
-});
-
-client.on("guildMemberRemove", async member => {
-    if (member.guild.id !== "154305477323390976") return;
-    await sleep(3000);
-    const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
-
-    if (auditLog.action !== "MEMBER_KICK") return;
-
-    if (auditLog.target.id !== member.user.id) return;
-
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
-    embed.setThumbnail(member.user.displayAvatarURL);
-    embed.setColor(0xFF470F);
-    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
-    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
-    embed.setTimestamp(auditLog.createdAt);
-    embed.setFooter(`ID: ${member.user.id}`);
-
-    client.channels.get("154637540341710848").send({ embed });
-});
-
 client.on("guildCreate", async guild => {
     client.guildSettings.set(guild.id, defaultSettings);
 });
@@ -97,10 +44,25 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type !== "text") return; // only do things in a text channel
-    if (!msg.channel.permissionsFor(msg.guild.me).has("SEND_MESSAGES")) return;
+    if (msg.channel.type === "dm" && !msg.author.bot) {
+        // respond to DMs but only with cleverbot and stop us from responding to ourselves
+        msg.channel.startTyping();
+        try {
+            const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
+            
+            msg.channel.send(`${response}`);
+            msg.channel.stopTyping();
+        } catch (err) {
+            msg.channel.send("Failed to get a response!");
+            msg.channel.stopTyping();
+        }
+        return;
+    }
+
+    if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
     if (prefixMention.test(msg.content)) {
+        // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
@@ -142,35 +104,7 @@ client.on("message", async msg => {
         }
 
         // checking disabled commands
-        if (guildSettings.disabledCommands.length > 0) {
-            for (let i = 0; i < guildSettings.disabledCommands.length; i++) {
-                const disabledCommand = guildSettings.disabledCommands[i];
-
-                // remember, the structure for disabledCommand looks like this: {command: string, channels: []}
-                // channels can be empty
-
-                if (disabledCommand.channels.length > 0) {
-                    // this command is disabled in one or more channels
-                    for (let j = 0; j < disabledCommand.channels.length; j++) {
-                        if (disabledCommand.channels[j] !== msg.channel.id) continue;
-
-                        if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled in this channel!");
-
-                        if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
-                            if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled in this channel!");
-                        }
-                    }
-                } else {
-                    // this command is disabled for the guild
-                    if (disabledCommand.command === cmd) return msg.channel.send("That command is disabled!");
-
-                    if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
-                        if (disabledCommand.command === client.commands[cmd].help.name) return msg.channel.send("That command is disabled!");
-                    }
-                }
-            }
-        }
-
+        if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
         // finally run the command
         client.commands[cmd].run(client, msg, args);
     }
@@ -180,6 +114,57 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
     if (newMember.guild.voiceConnection) {
         if (newMember.guild.voiceConnection.channel.members.size === 1 && newMember.guild.voiceConnection.channel.members.first() === newMember.guild.me) newMember.guild.voiceConnection.channel.leave();
     }
+});
+
+client.on("guildBanAdd", async (guild, user) => {
+    if (guild.id !== "154305477323390976") return;
+    await sleep(3000);
+    const auditLog = (await guild.fetchAuditLogs()).entries.first(); // potential race condition here
+    // waiting a second or so should prevent it from ever happening, if it even can happen.
+
+    if (auditLog.action !== "MEMBER_BAN_ADD") {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
+        return;
+    }
+
+    if (auditLog.target.id !== user.id) {
+        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
+        return;
+    }
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Banned", user.displayAvatarURL);
+    embed.setThumbnail(user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
+    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${user.id}`);
+
+    client.channels.get("154637540341710848").send({ embed });
+});
+
+client.on("guildMemberRemove", async member => {
+    if (member.guild.id !== "154305477323390976") return;
+    await sleep(3000);
+    const auditLog = (await member.guild.fetchAuditLogs()).entries.first(); // potential race condition here
+
+    if (auditLog.action !== "MEMBER_KICK") return;
+
+    if (auditLog.target.id !== member.user.id) return;
+
+    const embed = new Discord.RichEmbed();
+    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
+    embed.setThumbnail(member.user.displayAvatarURL);
+    embed.setColor(0xFF470F);
+    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
+    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
+    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+    embed.setTimestamp(auditLog.createdAt);
+    embed.setFooter(`ID: ${member.user.id}`);
+
+    client.channels.get("154637540341710848").send({ embed });
 });
 
 client.loadCommands = () => {
@@ -200,6 +185,37 @@ client.loadCommands = () => {
     }
     console.log(`Loaded ${commands.length} commands!`);
 };
+
+function checkDisabledCommands(cmd, guildSettings, channelID) {
+    if (guildSettings.disabledCommands.length > 0) {
+        for (let i = 0; i < guildSettings.disabledCommands.length; i++) {
+            const disabledCommand = guildSettings.disabledCommands[i];
+
+            // remember, the structure for disabledCommand looks like this: {command: string, channels: []}
+            // channels can be empty
+
+            if (disabledCommand.channels.length > 0) {
+                // this command is disabled in one or more channels
+                for (let j = 0; j < disabledCommand.channels.length; j++) {
+                    if (disabledCommand.channels[j] !== channelID) continue;
+
+                    if (disabledCommand.command === cmd) return true;
+
+                    if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                        if (disabledCommand.command === client.commands[cmd].help.name) return true;
+                    }
+                }
+            } else {
+                // this command is disabled for the guild
+                if (disabledCommand.command === cmd) return true;
+
+                if (client.commands[cmd].help) { // all our commands with aliases have help info so we can get the real command name
+                    if (disabledCommand.command === client.commands[cmd].help.name) return true;
+                }
+            }
+        }
+    }
+}
 
 process.on("SIGINT", async () => {
     client.guildSettings.db.close();
