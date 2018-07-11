@@ -3,7 +3,7 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "config",
     usage: "config <prefix|cmd|limits> [args]",
-    info: "Configure the prefix for command and disable commands."
+    info: "Configure the prefix for commands and disable commands."
 };
 
 const blacklist = /eval|config/g;

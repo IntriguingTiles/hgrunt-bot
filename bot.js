@@ -10,6 +10,7 @@ const sleep = require("util").promisify(setTimeout);
 const server = express();
 
 const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
+cleverbot.create();
 
 const client = new Discord.Client({ disableEveryone: true });
 client.guildSettings = new Enmap({ provider: new EnmapLevel({ name: "guildSettings" }) });
