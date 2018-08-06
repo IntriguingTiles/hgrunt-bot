@@ -31,7 +31,7 @@ exports.run = async (client, msg, args) => {
     const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
         msg.react("❌");
-        msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use ${guildSettings.prefix}limits to disable the limits.`);
+        msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
         return;
     }
     if (args.length > 0) {
