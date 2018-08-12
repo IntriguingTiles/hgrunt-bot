@@ -27,7 +27,10 @@ const defaultSettings = {
 
 client.login(process.env.DISCORD_TOKEN);
 
-process.on("unhandledRejection", err => console.error(`Unhandled promise rejection!\n${err.stack}`));
+process.on("unhandledRejection", err => {
+    console.error(`Unhandled promise rejection!\n${err.stack}`);
+    client.users.get("221017760111656961").send(err.stack);
+});
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);

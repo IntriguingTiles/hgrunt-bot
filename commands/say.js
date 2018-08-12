@@ -30,7 +30,7 @@ exports.run = async (client, msg, args) => {
     const guildSettings = client.guildSettings.get(msg.guild.id);
     const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
-        msg.react("❌");
+        msg.react("❌").catch(() => {}); // silently fail
         msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
         return;
     }
@@ -71,7 +71,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
         let foundLine = false;
 
         if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
-            msg.react("❌");
+            msg.react("❌").catch(() => {});
             msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
             return;
         }
@@ -88,7 +88,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
         }
 
         if (!foundLine) {
-            msg.react("❌");
+            msg.react("❌").catch(() => {});
             msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`);
             if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => { });
             return;
@@ -100,7 +100,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
 
     if (lastLine) lines.push(location + lastLine);
     msg.client.wordsSaid += args.length;
-    msg.react("👌");
+    msg.react("👌").catch(() => {});
     voice.addLines(msg, lines);
 
     rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
