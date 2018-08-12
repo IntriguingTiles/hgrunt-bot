@@ -32,6 +32,9 @@ process.on("unhandledRejection", err => {
     client.users.get("221017760111656961").send(err.stack);
 });
 
+client.on("error", console.error);
+client.on("warn", console.warn);
+
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.username}`);
     client.loadCommands();
