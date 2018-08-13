@@ -29,6 +29,10 @@ exports.run = async (client, msg, args) => {
     } else {
         // search for a comic
         const comic = comicList.get(comicList.keyArray().find(comic => comic.includes(args.join(" ").toLowerCase())));
+        if (!comic) {
+            msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            return msg.channel.stopTyping();
+        }
         postComic(comic, msg);
     }
 };
