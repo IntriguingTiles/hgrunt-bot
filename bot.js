@@ -2,7 +2,6 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const fs = require("fs");
 const Enmap = require("enmap");
-const EnmapLevel = require("enmap-level");
 const Cleverbot = require("./utils/cleverbot.js");
 const express = require("express");
 const sleep = require("util").promisify(setTimeout);
@@ -13,7 +12,7 @@ const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
 cleverbot.create();
 
 const client = new Discord.Client({ disableEveryone: true });
-client.guildSettings = new Enmap({ provider: new EnmapLevel({ name: "guildSettings" }) });
+client.guildSettings = new Enmap({ name: "guildSettings" });
 client.mSent = 0;
 client.wordsSaid = 0;
 
@@ -51,13 +50,13 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type === "dm" ) {
+    if (msg.channel.type === "dm") {
         // respond to DMs but only with cleverbot and stop us from responding to ourselves
         if (msg.author.bot) return;
         msg.channel.startTyping();
         try {
             const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
-            
+
             msg.channel.send(`${response}`);
             msg.channel.stopTyping();
         } catch (err) {
@@ -76,7 +75,7 @@ client.on("message", async msg => {
         msg.channel.startTyping();
         try {
             const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
-            
+
             msg.channel.send(`${msg.author} ${response}`);
             msg.channel.stopTyping();
         } catch (err) {
@@ -226,7 +225,7 @@ function checkDisabledCommands(cmd, guildSettings, channelID) {
 }
 
 process.on("SIGINT", async () => {
-    client.guildSettings.db.close();
+    client.guildSettings.close();
     await client.destroy();
     process.exit(0);
 });
