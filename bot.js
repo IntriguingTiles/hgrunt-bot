@@ -12,7 +12,14 @@ const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
 cleverbot.create();
 
 const client = new Discord.Client({ disableEveryone: true });
-client.guildSettings = new Enmap({ name: "guildSettings" });
+
+client.guildSettings = new Enmap({
+    name: "guildSettings",
+    fetchAll: false,
+    autoFetch: true,
+    cloneLevel: "deep"
+});
+
 client.mSent = 0;
 client.wordsSaid = 0;
 
