@@ -5,17 +5,20 @@ const moment = require("moment");
 require("moment-duration-format");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
-const hgruntVoiceLines = fs.readdirSync("./hgrunt").sort((a, b) => {
+const hgruntVoiceLines = fs.readdirSync("./voice/hgrunt").sort((a, b) => {
     if (a.endsWith("!.wav")) return 1;
     return a.localeCompare(b);
 });
-const voxVoiceLines = fs.readdirSync("./vox");
+const voxVoiceLines = fs.readdirSync("./voice/vox");
+const metrocopVoiceLines = fs.readdirSync("./voice/metropolice");
+const combineVoiceLines = fs.readdirSync("./voice/combine_soldier");
+const overwatchVoiceLines = fs.readdirSync("./voice/overwatch");
 
 const rateLimitedUsers = new Map();
 
 exports.help = {
     name: "say",
-    usage: "say [vox] <words>",
+    usage: "say [vox|metrocop|combine|overwatch] <words>",
     info: "Speaks words in a voice channel"
 };
 
@@ -30,20 +33,37 @@ exports.run = async (client, msg, args) => {
     const guildSettings = client.guildSettings.get(msg.guild.id);
     const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
-        msg.react("❌").catch(() => {}); // silently fail
+        msg.react("❌").catch(() => { }); // silently fail
         msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
         return;
     }
     if (args.length > 0) {
-        if (args[0] === "vox") {
-            if (args.length < 2) return msg.channel.send("```Usage: !say [vox] <words>```");
-            args.shift(); // remove vox from args
-            parse(msg, args, guildSettings, voxVoiceLines, "dadeda.wav");
-        } else {
-            parse(msg, args, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
+        switch (args[0]) {
+            case "vox":
+                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [vox] <words>`, { code: "" });
+                args.shift(); // remove vox from args
+                parse(msg, args, guildSettings, voxVoiceLines, "dadeda.wav");
+                break;
+            case "metrocop":
+                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [metrocop] <words>`, { code: "" });
+                args.shift();
+                parse(msg, args, guildSettings, metrocopVoiceLines, "on1.wav", "off1.wav");
+                break;
+            case "combine":
+                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [combine] <words>`, { code: "" });
+                args.shift();
+                parse(msg, args, guildSettings, combineVoiceLines, "on1.wav", "off1.wav");
+                break;
+            case "overwatch":
+                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [overwatch] <words>`, { code: "" });
+                args.shift();
+                parse(msg, args, guildSettings, overwatchVoiceLines, "on1.wav", "off1.wav");
+                break;
+            default:
+                parse(msg, args, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
         }
     } else {
-        msg.channel.send("```Usage: !say [vox] <words>```");
+        msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
     }
 };
 
@@ -54,7 +74,7 @@ exports.run = async (client, msg, args) => {
  * @param {string} firstLine 
  * @param {string} lastLine 
  */
-function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
+async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
     const shouldLimit = guildSettings.limits;
     if (rateLimitedUsers.has(msg.author.id)) {
         tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
@@ -62,7 +82,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
     }
 
     if (!msg.member.voiceChannel) return msg.channel.send("Join a voice channel first!");
-    const location = voiceLines === voxVoiceLines ? "./vox/" : "./hgrunt/";
+    const location = getVoiceLineLocation(voiceLines);
 
     const lines = [location + firstLine];
 
@@ -71,7 +91,7 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
         let foundLine = false;
 
         if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
-            msg.react("❌").catch(() => {});
+            msg.react("❌").catch(() => { });
             msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
             return;
         }
@@ -88,9 +108,8 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
         }
 
         if (!foundLine) {
-            msg.react("❌").catch(() => {});
+            msg.react("❌").catch(() => { });
             msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`);
-            if (location === "./vox/") fs.appendFile("./no_line.txt", `\n${arg}`, () => { });
             return;
         }
 
@@ -100,11 +119,21 @@ function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
 
     if (lastLine) lines.push(location + lastLine);
     msg.client.wordsSaid += args.length;
-    msg.react("👌").catch(() => {});
+    msg.react("👌").catch(() => { });
     voice.addLines(msg, lines);
 
     rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
     setTimeout(() => {
         rateLimitedUsers.delete(msg.author.id);
     }, 10000);
+}
+
+function getVoiceLineLocation(voiceLines) {
+    switch (voiceLines) {
+        case hgruntVoiceLines:      return "./voice/hgrunt/";
+        case voxVoiceLines:         return "./voice/vox/";
+        case metrocopVoiceLines:    return "./voice/metropolice/";
+        case combineVoiceLines:     return "./voice/combine_soldier/";
+        case overwatchVoiceLines:   return "./voice/overwatch/";
+    }
 }
