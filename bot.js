@@ -57,38 +57,24 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (msg.channel.type === "dm") {
-        // respond to DMs but only with cleverbot and stop us from responding to ourselves
-        if (msg.author.bot) return;
-        msg.channel.startTyping();
-        try {
-            const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
-
-            msg.channel.send(`${response}`);
-            msg.channel.stopTyping();
-        } catch (err) {
-            msg.channel.send("Failed to get a response!");
-            msg.channel.stopTyping();
-        }
-        return;
-    }
-
     if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
-    if (prefixMention.test(msg.content)) {
+    if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
+
         try {
             const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
 
-            msg.channel.send(`${msg.author} ${response}`);
-            msg.channel.stopTyping();
+            if (msg.channel.type !== "dm") msg.channel.send(`${msg.author} ${response}`);
+            else msg.channel.send(response);
         } catch (err) {
             msg.channel.send("Failed to get a response!");
-            msg.channel.stopTyping();
         }
+
+        msg.channel.stopTyping();
 
         if (msg.author.bot) client.mSent++;
         return;

@@ -58,8 +58,7 @@ typings/
 .env
 
 # This has content copyrighted by Valve, don't really want to include that
-hgrunt/
-vox/
+voice/
 
 # Garfield Minus Garfield comics
 gmg/

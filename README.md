@@ -11,15 +11,20 @@ Join [HGrunt Hell](https://discord.gg/trWuQMv) or join the Half-Life Discord.
 git clone https://github.com/IntriguingTiles/hgrunt-bot.git
 cd hgrunt-bot
 mkdir gmg
+mkdir voice
+cd voice
 mkdir hgrunt
 mkdir vox
+mkdir metropolice
+mkdir combine_soldier
+mkdir overwatch
 npm install
 ```
 Now just put your token in the `DISCORD_TOKEN` environment variable and you should be good to go.
 
 If you want Cleverbot to work, put your info from [cleverbot.io](https://cleverbot.io/) in `CB_KEY` and `CB_USER`.
 
-If you want `!say` to work, grab the audio files for `hgrunt` and `vox` from Half-Life 1. You'll also need FFmpeg.
+If you want `!say` to work, grab the audio files for `hgrunt` and `vox` from Half-Life 1 and `metropolice`, `combine_soldier`, and `overwatch` from Half-Life 2. You'll also need FFmpeg.
 
 If you want `!gmg` to work, you'll have to scrape images from [garfield minus garfield](http://garfieldminusgarfield.net/) and place them in `gmg`.
 
