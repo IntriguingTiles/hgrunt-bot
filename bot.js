@@ -57,7 +57,9 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
+    if (msg.channel.type !== "dm" ? !msg.channel.permissionsFor(client.user).has("SEND_MESSAGES") : false) return;
+    // don't even bother with the messages if we can't type in that channel
+    // also check if we're in a dm first because DM channels don't really have permissions
 
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
