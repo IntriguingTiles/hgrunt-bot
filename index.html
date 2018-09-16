@@ -1,7 +1,7 @@
 <html lang="en-us">
 
 <head>
-    <title>HGrunt Voice Lines</title>
+    <title>HGrunt Bot</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,49 +11,21 @@
 
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
-
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/data/hgrunt.json', function (data) {
-                $.each(data, function (i, f) {
-                    $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#hgrunt tbody");
-                });
-                $("#hgrunt").DataTable();
-            });
-        });
-
-        $(document).ready(function () {
-            $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/data/vox.json', function (data) {
-                $.each(data, function (i, f) {
-                    $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#vox tbody");
-                });
-                $("#vox").DataTable();
-            });
-        });
-    </script>
 </head>
 
 <body>
-    <table id="hgrunt" class="display" cellspacing="0" width="100%">
-        <thead>
-            <th>HGrunt Lines</th>
-        </thead>
-
-        <tbody>
-        </tbody>
-    </table>
+    <h1>HGrunt Bot</h1>
+    <p>A Discord bot that can play voice lines in voice chat, generate HDTF banners, get garfield comics, and more.</p>
+    <a class="button" style="display: table" href="https://discordapp.com/oauth2/authorize/?permissions=3196992&scope=bot&client_id=396884008501510144">Add to Server</a><br>
     <hr>
-    <table id="vox" class="display" cellspacing="0" width="100%">
-        <thead>
-            <th>VOX Lines</th>
-        </thead>
-
-        <tbody>
-        </tbody>
-    </table>
+    <h1>Voice Lines List</h1>
+    <div style="display: grid">
+        <a class="button" href="/hgrunt.html">HGrunt</a>
+        <a class="button" href="/vox.html">VOX</a>
+        <a class="button" href="/metrocop.html">Metrocop</a>
+        <a class="button" href="/overwatch.html">Overwatch</a>
+        <a class="button" href="/combine.html">Combine Soldier</a>
+    </div>
 </body>
 
 </html>

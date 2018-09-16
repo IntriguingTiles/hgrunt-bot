@@ -6,7 +6,7 @@ body {
 h1 {
     text-align: center;
     font-size: 50px;
-    color: #EEEEEE;
+    color: #FF5500;
 }
 
 p {
@@ -20,7 +20,24 @@ a {
     color: #0f6fff;
 }
 
+.button {
+    border: 0px;
+    border-radius: 3px;
+    background-color: #7289da;
+    padding: 16px;
+    color: #FFF;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
 td {
+    color: #EEEEEE;
+}
+
+th {
     color: #EEEEEE;
 }
 
