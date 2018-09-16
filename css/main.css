@@ -45,6 +45,10 @@ label {
     color: #EEEEEE;
 }
 
+span {
+    color: #EEEEEE;
+}
+
 /* DATA TABLE STUFF BELOW */
 
 /*
@@ -281,11 +285,12 @@ label {
         text-decoration: none !important;
         cursor: pointer;
         *cursor: hand;
-        color: #333333 !important;
+        color: #EEEEEE !important;
+        background-color: #4a4a4a;
         border: 1px solid transparent;
         border-radius: 2px; }
         .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-          color: #333333 !important;
+          color: #EEEEEE !important;
           border: 1px solid black;
           background-color: #8b8b8b;
           background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8b8b8b), color-stop(100%, #444444));
