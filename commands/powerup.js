@@ -25,7 +25,7 @@ exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
     if (args.length === 0) {
         // random comic
-        postComic(comicList.random(), msg);
+        sendComic(comicList.random(), msg);
     } else {
         // search for a comic
         const comic = comicList.get(comicList.keyArray().find(comic => comic.includes(args.join(" ").toLowerCase())));
@@ -33,11 +33,11 @@ exports.run = async (client, msg, args) => {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
             return msg.channel.stopTyping();
         }
-        postComic(comic, msg);
+        sendComic(comic, msg);
     }
 };
 
-async function postComic(comic, msg) {
+async function sendComic(comic, msg) {
     const html = (await snekfetch.get(`https://www.theduckwebcomics.com/Powerup_Comics/${comic}/`)).body;
     const $ = cheerio.load(html);
 
