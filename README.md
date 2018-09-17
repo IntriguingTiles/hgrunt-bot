@@ -18,6 +18,7 @@ mkdir vox
 mkdir metropolice
 mkdir combine_soldier
 mkdir overwatch
+cd ..
 npm install
 ```
 Now just put your token in the `DISCORD_TOKEN` environment variable and you should be good to go.
