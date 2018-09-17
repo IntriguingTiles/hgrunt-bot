@@ -55,7 +55,7 @@ async function sendImage(url, msg) {
         img.scaleToFit(501, 382);
         finalImg.composite(img, 0, 207);
         finalImg.composite(sadCat, 0, 0);
-        msg.channel.send({ files: [await finalImg.getBufferAsync(Jimp.AUTO)] });
+        await msg.channel.send({ files: [await finalImg.getBufferAsync(Jimp.AUTO)] });
     } catch (err) {
         msg.channel.send("Bad URL or not an image!");
     }
