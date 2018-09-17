@@ -57,12 +57,6 @@ client.on("guildDelete", async guild => {
 });
 
 client.on("message", async msg => {
-    // temporary vector message forwarder
-    if (msg.author.id === "146398931176128512") {
-        if (!client.users.get("217671664656318465")) await client.fetchUser("217671664656318465");
-        client.users.get("217671664656318465").send(msg.content, { files: msg.attachments.array() });
-    }
-    //
     if (msg.channel.type !== "dm" ? !msg.channel.permissionsFor(client.user).has("SEND_MESSAGES") : false) return;
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
