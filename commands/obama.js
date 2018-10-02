@@ -21,14 +21,20 @@ exports.run = async (client, msg, args) => {
         // go and get 'em
         msg.channel.startTyping();
         const words = args.join(" ");
-        const request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
+        let request;
+        try {
+            request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
+        } catch (err) {
+            msg.channel.send("Failed to create video! Probably an issue with your input.");
+            return msg.channel.stopTyping();
+        }
         //console.log(request.headers.location);
         const videoURLBase = `http://talkobamato.me/synth/output/${request.headers.location.split("=")[1]}`;
         const videoURL = `${videoURLBase}/obama.mp4`;
         const videoDoneURL = `${videoURLBase}/video_created.txt`;
         let videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
 
-        while (!videoDone) {
+        while (!videoDone) { // if the video isn't done, videoDone will be undefined
             // we need to make sure the video is finished before sending it
             sleep(2000);
             videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
