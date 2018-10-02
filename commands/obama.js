@@ -42,7 +42,7 @@ exports.run = async (client, msg, args) => {
             videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
         }
         // video should be done now, send it
-        msg.channel.send({ files: [videoURL] });
+        msg.channel.send({ files: [videoURL] }).catch(() => msg.channel.send("Failed to create video! Probably an issue with your input."));
         msg.channel.stopTyping();
     }
 };
