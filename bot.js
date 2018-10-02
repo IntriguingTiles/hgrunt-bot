@@ -108,7 +108,15 @@ client.on("message", async msg => {
         // checking disabled commands
         if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
         // finally run the command
-        client.commands[cmd].run(client, msg, args);
+        // all commands should be async
+        client.commands[cmd].run(client, msg, args).catch(err => {
+            console.log(`Error! Command: ${msg.content}\n${err.stack}`);
+            const dev = client.users.get("221017760111656961");
+            dev.send(`Error! Command: \`${msg.content}\``);
+            dev.send(err.stack, {code: ""});
+            msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
+            if (msg.channel.typing) msg.channel.stopTyping();
+        });
     }
 });
 

@@ -8,6 +8,8 @@ exports.help = {
     info: "COME AND GET 'EM..... OBAMAAAAAA"
 };
 
+exports.requiredPermissions = ["ATTACH_FILES"];
+
 /**
  * @param {Client} client
  * @param {Message} msg
@@ -36,7 +38,7 @@ exports.run = async (client, msg, args) => {
 
         while (!videoDone) { // if the video isn't done, videoDone will be undefined
             // we need to make sure the video is finished before sending it
-            sleep(2000);
+            await sleep(2000);
             videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
         }
         // video should be done now, send it
