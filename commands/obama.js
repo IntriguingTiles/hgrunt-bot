@@ -27,7 +27,7 @@ exports.run = async (client, msg, args) => {
         try {
             request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
         } catch (err) {
-            msg.channel.send("Obama video generator is currently broken. Thanks, Obama.");
+            msg.channel.send("Failed to create video! Probably an issue with your input.");
             return msg.channel.stopTyping();
         }
         //console.log(request.headers.location);
