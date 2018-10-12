@@ -33,7 +33,6 @@ exports.run = async (client, msg, args) => {
             request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
         } catch (err) {
             msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg);
-            );
             return msg.channel.stopTyping();
         }
         //console.log(request.headers.location);
