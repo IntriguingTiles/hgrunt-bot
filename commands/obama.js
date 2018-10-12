@@ -2,6 +2,9 @@ const snekfetch = require("snekfetch");
 const sleep = require("util").promisify(setTimeout);
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
+const errorMsg = "Failed to create video! Probably an issue with your input.";
+const obamaDownMsg = "Obama video generator is currently broken. Thanks, Obama.";
+
 exports.help = {
     name: "obama",
     usage: "obama <text>",
@@ -9,6 +12,8 @@ exports.help = {
 };
 
 exports.requiredPermissions = ["ATTACH_FILES"];
+
+exports.obamaDown = false;
 
 /**
  * @param {Client} client
@@ -27,7 +32,8 @@ exports.run = async (client, msg, args) => {
         try {
             request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
         } catch (err) {
-            msg.channel.send("Failed to create video! Probably an issue with your input.");
+            msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg);
+            );
             return msg.channel.stopTyping();
         }
         //console.log(request.headers.location);
@@ -42,7 +48,7 @@ exports.run = async (client, msg, args) => {
             videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
         }
         // video should be done now, send it
-        msg.channel.send({ files: [videoURL] }).catch(() => msg.channel.send("Failed to create video! Probably an issue with your input."));
+        msg.channel.send({ files: [videoURL] }).catch(() => msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg));
         msg.channel.stopTyping();
     }
 };
