@@ -66,7 +66,7 @@ client.on("message", async msg => {
         const embed = msg.embeds[0];
 
         if (embed.author.name === "Member Joined" || embed.author.name === "Member Left") {
-            if (embed.description.match(/.+\..+\/.+/g)) {
+            if (embed.description.match(/.+\..+\/.+|twitter\/.+/g)) {
                 // probably has a URL in their name, delete the message
                 msg.delete().catch(() => { });
             }
