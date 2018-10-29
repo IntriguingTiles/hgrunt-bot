@@ -11,7 +11,12 @@ module.exports = class Cleverbot {
         this.key = key;
     }
 
-    async create() {
+    /**
+     * Creates a new Cleverbot session.
+     * @param {string} nick 
+     */
+    async create(nick) {
+        if (nick) return this.nick = nick;
         const response = (await snekfetch.post("https://cleverbot.io/1.0/create").set("Content-Type", "application/x-www-form-urlencoded").send({ user: this.user, key: this.key })).body;
         if (response.status !== "success") throw new Error(`Failed to create a cleverbot instance! ${response.status}`);
         this.nick = response.nick;

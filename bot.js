@@ -9,7 +9,7 @@ const sleep = require("util").promisify(setTimeout);
 const server = express();
 
 const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
-cleverbot.create();
+cleverbot.create("9z3eaesi"); // cleverbot doesn't like me and refuses to create new sessions for some reason
 
 const client = new Discord.Client({ disableEveryone: true });
 
