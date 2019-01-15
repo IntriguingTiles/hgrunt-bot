@@ -1,5 +1,6 @@
 const garfield = require("garfield");
 const moment = require("moment");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -21,7 +22,7 @@ exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
 
     if (args.length === 0) {
-        msg.channel.send({ files: [garfield.random()] }).catch(() => msg.channel.send("Failed to get random comic!"));
+        msg.channel.send({ files: [garfield.random()] }).catch(async () => msg.channel.send(await translate("Failed to get random comic!")));
         msg.channel.stopTyping();
     } else if (args.length === 1) {
         try {
@@ -41,7 +42,7 @@ exports.run = async (client, msg, args) => {
             const date = moment(args[0], moment.ISO_8601);
 
             if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
-                msg.channel.send("You can't search for comics earlier than 1978-06-19!");
+                msg.channel.send(await translate("You can't search for comics earlier than 1978-06-19!"));
                 msg.channel.stopTyping();
                 return;
             }

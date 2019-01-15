@@ -1,4 +1,5 @@
 const fs = require("fs");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const commands = fs.readdirSync("./commands/");
@@ -29,12 +30,12 @@ exports.run = async (client, msg, args) => {
                     helpText = `\nCommand: ${prefix}${cmd.help.name}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
                 }
 
-                msg.channel.send(helpText, {code: ""});
+                msg.channel.send(await translate(helpText), {code: ""});
                 return;
             }
         }
 
-        msg.channel.send("Command not found!");
+        msg.channel.send(await translate("Command not found!"));
     } else {
         let final = "Commands list: \n```\n";
 

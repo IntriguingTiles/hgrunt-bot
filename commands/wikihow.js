@@ -1,5 +1,6 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
+const translate = require("../utils/translate.js");
 const { Client, Message, RichEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -25,7 +26,7 @@ exports.run = async (client, msg, args) => {
         const results = (await snekfetch.get(`https://www.wikihow.com/api.php?action=titlesearch&q=${search}&safeSearch=0&format=json`)).body; // gives us json we can work with
 
         if (!results.data[0]) {
-            msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            msg.channel.send(await translate(`No results found for \`${args.join(" ")}\`!`));
             return msg.channel.stopTyping();
         }
 
@@ -54,11 +55,11 @@ async function sendArticle(msg, article) {
     const embed = new RichEmbed();
 
     embed.setAuthor("wikiHow", "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png");
-    embed.setTitle(title);
-    embed.setURL(url);
+    embed.setTitle(await translate(title));
+    embed.setURL(await translate(url));
     embed.setColor(0x93B874);
-    embed.setDescription(description);
-    embed.setImage(img);
+    embed.setDescription(await translate(description));
+    embed.setImage(await translate(img));
     msg.channel.send({ embed });
     msg.channel.stopTyping();
 }

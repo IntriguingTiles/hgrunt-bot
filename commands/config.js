@@ -1,3 +1,4 @@
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -28,16 +29,16 @@ exports.run = async (client, msg, args) => {
                 guildSettings.prefix = args[1];
                 client.guildSettings.set(msg.guild.id, guildSettings);
 
-                msg.channel.send(`The prefix has been successfully updated to \`${guildSettings.prefix}\`!`);
+                msg.channel.send(await translate(`The prefix has been successfully updated to \`${guildSettings.prefix}\`!`));
                 break;
             case "limits":
                 guildSettings.limits = !guildSettings.limits;
                 client.guildSettings.set(msg.guild.id, guildSettings);
 
                 if (guildSettings.limits) {
-                    msg.channel.send("Limits enabled!");
+                    msg.channel.send(await translate("Limits enabled!"));
                 } else {
-                    msg.channel.send("Limits disabled!");
+                    msg.channel.send(await translate("Limits disabled!"));
                 }
                 break;
             case "cmd": // do not look at this part if you value your sanity. i actually have no idea how this code works anymore.
@@ -45,7 +46,7 @@ exports.run = async (client, msg, args) => {
                     case "disable":
                         if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });
 
-                        if (blacklist.test(args[2] || blacklist.test(args[3]))) return msg.channel.send("You can't disable that command!");
+                        if (blacklist.test(args[2] || blacklist.test(args[3]))) return msg.channel.send(await translate("You can't disable that command!"));
 
                         if (args[2] === "server") {
                             // disable command for the entire guild
@@ -53,9 +54,9 @@ exports.run = async (client, msg, args) => {
 
                             let realCmd = args[3].replace(guildSettings.prefix, "");
 
-                            if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
+                            if (!client.commands[realCmd]) return msg.channel.send(await translate("Command not found!"));
                             if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
-                            if (disabledCommands.some(dc => dc.command === realCmd && dc.channels.length === 0)) return msg.channel.send("That command is already disabled!");
+                            if (disabledCommands.some(dc => dc.command === realCmd && dc.channels.length === 0)) return msg.channel.send(await translate("That command is already disabled!"));
 
                             if (disabledCommands.some(dc => dc.command === realCmd)) { // command was disabled in a channel before, override it
                                 disabledCommands.find(dc => dc.command === realCmd).channels = [];
@@ -65,13 +66,13 @@ exports.run = async (client, msg, args) => {
 
                             client.guildSettings.set(msg.guild.id, guildSettings);
 
-                            return msg.channel.send("Command successfully disabled server-wide!");
+                            return msg.channel.send(await translate("Command successfully disabled server-wide!"));
                         } else {
                             let realCmd = args[2].replace(guildSettings.prefix, "");
 
-                            if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
+                            if (!client.commands[realCmd]) return msg.channel.send(await translate("Command not found!"));
                             if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
-                            if (disabledCommands.some(dc => dc.command === realCmd && dc.channels.includes(msg.channel.id))) return msg.channel.send("That command is already disabled in this channel!");
+                            if (disabledCommands.some(dc => dc.command === realCmd && dc.channels.includes(msg.channel.id))) return msg.channel.send(await translate("That command is already disabled in this channel!"));
 
                             if (disabledCommands.some(dc => dc.command === realCmd)) { // command was disabled in a channel before, add this channel id to it
                                 disabledCommands.find(dc => dc.command === realCmd).channels.push(msg.channel.id);
@@ -81,18 +82,18 @@ exports.run = async (client, msg, args) => {
 
                             client.guildSettings.set(msg.guild.id, guildSettings);
 
-                            return msg.channel.send("Command successfully disabled in this channel!");
+                            return msg.channel.send(await translate("Command successfully disabled in this channel!"));
                         }
                     case "enable": {
                         if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd enable <cmd>`, { code: "" });
 
                         let realCmd = args[2].replace(guildSettings.prefix, "");
 
-                        if (!client.commands[realCmd]) return msg.channel.send("Command not found!");
+                        if (!client.commands[realCmd]) return msg.channel.send(await translate("Command not found!"));
                         if (client.commands[realCmd].help) realCmd = client.commands[realCmd].help.name; // lookup real command name in case this is an alias
-                        if (!disabledCommands.some(dc => dc.command === realCmd)) return msg.channel.send("That command is already enabled!");
+                        if (!disabledCommands.some(dc => dc.command === realCmd)) return msg.channel.send(await translate("That command is already enabled!"));
                         if (!disabledCommands.some(dc => dc.command === realCmd
-                            && dc.channels.includes(msg.channel.id)) && disabledCommands.find(dc => dc.command === realCmd).channels.length > 0) return msg.channel.send("That command is already enabled here!");
+                            && dc.channels.includes(msg.channel.id)) && disabledCommands.find(dc => dc.command === realCmd).channels.length > 0) return msg.channel.send(await translate("That command is already enabled here!"));
 
                         const channels = disabledCommands.find(dc => dc.command === realCmd).channels;
 
@@ -104,10 +105,10 @@ exports.run = async (client, msg, args) => {
 
                         client.guildSettings.set(msg.guild.id, guildSettings);
 
-                        return msg.channel.send("Command successfully enabled in this channel!");
+                        return msg.channel.send(await translate("Command successfully enabled in this channel!"));
                     }
                     case "list": {
-                        if (disabledCommands.length === 0) return msg.channel.send("No commands have been disabled!");
+                        if (disabledCommands.length === 0) return msg.channel.send(await translate("No commands have been disabled!"));
 
                         let final = "Disabled Commands:```\n";
 
@@ -128,6 +129,6 @@ exports.run = async (client, msg, args) => {
             default: return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
         }
     } else {
-        msg.reply("You need to have the `Manage Server` permission to use this command!");
+        msg.reply(await translate("You need to have the `Manage Server` permission to use this command!"));
     }
 };

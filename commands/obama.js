@@ -1,5 +1,6 @@
 const snekfetch = require("snekfetch");
 const sleep = require("util").promisify(setTimeout);
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const errorMsg = "Failed to create video! Probably an issue with your input.";
@@ -47,7 +48,7 @@ exports.run = async (client, msg, args) => {
             videoDone = await snekfetch.get(videoDoneURL).catch(() => { });
         }
         // video should be done now, send it
-        msg.channel.send({ files: [videoURL] }).catch(() => msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg));
+        msg.channel.send({ files: [videoURL] }).catch(async () => msg.channel.send(exports.obamaDown ? await translate(obamaDownMsg) : await translate(errorMsg)));
         msg.channel.stopTyping();
     }
 };

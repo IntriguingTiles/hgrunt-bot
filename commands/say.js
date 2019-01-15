@@ -3,6 +3,7 @@ const tempMessage = require("../utils/tempmessage.js");
 const voice = require("../utils/voice.js");
 const moment = require("moment");
 require("moment-duration-format");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const hgruntVoiceLines = fs.readdirSync("./voice/hgrunt").sort((a, b) => {
@@ -34,7 +35,7 @@ exports.run = async (client, msg, args) => {
     const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
         msg.react("❌").catch(() => { }); // silently fail
-        msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
+        msg.channel.send(await translate(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`));
         return;
     }
     if (args.length > 0) {
@@ -77,11 +78,11 @@ exports.run = async (client, msg, args) => {
 async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
     const shouldLimit = guildSettings.limits;
     if (rateLimitedUsers.has(msg.author.id)) {
-        tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
+        tempMessage(msg.channel, await translate(`You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`), 5000);
         return;
     }
 
-    if (!msg.member.voiceChannel) return msg.channel.send("Join a voice channel first!");
+    if (!msg.member.voiceChannel) return msg.channel.send(await translate("Join a voice channel first!"));
     const location = getVoiceLineLocation(voiceLines);
 
     const lines = [location + firstLine];
@@ -92,7 +93,7 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
 
         if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
             msg.react("❌").catch(() => { });
-            msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
+            msg.channel.send(await translate(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`));
             return;
         }
 
@@ -109,7 +110,7 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
 
         if (!foundLine) {
             msg.react("❌").catch(() => { });
-            msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`);
+            msg.channel.send(await translate(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`));
             return;
         }
 

@@ -1,5 +1,6 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -28,7 +29,7 @@ exports.run = async (client, msg, args) => {
 
     const html = (await snekfetch.get("http://garfield.zweistein.cz/")).body;
     if (!html) {
-        msg.channel.send("Failed to get comic!");
+        msg.channel.send(await translate("Failed to get comic!"));
         msg.channel.stopTyping();
     }
 

@@ -1,4 +1,5 @@
 const Jimp = require("jimp");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -37,7 +38,7 @@ exports.run = async (client, msg, args) => {
             const url = msgs.filter(msg => msg.attachments.size !== 0).find(msg => msg.attachments.first().width).attachments.first().url;
             sendImage(url, msg);
         } catch (err) {
-            msg.channel.send("Failed to find an image in the last 50 messages!");
+            msg.channel.send(await translate("Failed to find an image in the last 50 messages!"));
             msg.channel.stopTyping();
         }
     }
@@ -57,7 +58,7 @@ async function sendImage(url, msg) {
         finalImg.composite(sadCat, 0, 0);
         await msg.channel.send({ files: [await finalImg.getBufferAsync(Jimp.AUTO)] });
     } catch (err) {
-        msg.channel.send("Bad URL or not an image!");
+        msg.channel.send(await translate("Bad URL or not an image!"));
     }
 
     msg.channel.stopTyping();

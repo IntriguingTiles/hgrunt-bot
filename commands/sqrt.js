@@ -1,5 +1,6 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
+const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -32,7 +33,7 @@ exports.run = async (client, msg, args) => {
         const comic = $("a").filter(function () { return $(this).text().trim() === args[0]; }).first().attr("href"); //eslint-disable-line brace-style
 
         if (!comic) {
-            msg.channel.send("No comic was found for `" + args[0] + "` - check the date format (YYYY-MM-DD)");
+            msg.channel.send(await translate("No comic was found for `" + args[0] + "` - check the date format (YYYY-MM-DD)"));
             msg.channel.stopTyping();
             return;
         }
