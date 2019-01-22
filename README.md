@@ -4,7 +4,7 @@ This is a discord.js bot that can play hgrunt/VOX lines in a voice channel, gene
 [Add HGrunt](https://discordapp.com/oauth2/authorize/?permissions=3196992&scope=bot&client_id=396884008501510144)
 
 # Support
-Join [HGrunt Hell](https://discord.gg/trWuQMv) or join the Half-Life Discord.
+Join [HGrunt Hell](https://discord.gg/trWuQMv).
 
 # Running your own instance
 ```
