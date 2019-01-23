@@ -22,7 +22,7 @@ module.exports = async (msg, args, banner) => {
 
         for (let i = 0; i < args.length; i++) {
             for (let j = 0; j < args[i].length; j++) {
-                let char = args[i].charAt(j);
+                let char = args[i].charAt(j).toLowerCase();
                 if (char === "?") char = "qmark";
 
                 const letter = await Jimp.read(`./hdtf/${char}.png`);
