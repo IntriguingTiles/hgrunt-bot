@@ -22,7 +22,7 @@
     "cheerio": "^1.0.0-rc.2",
     "discord.js": "^11.4.2",
     "dotenv": "^6.2.0",
-    "enmap": "^4.6.6",
+    "enmap": "^4.7.1",
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.16.4",
     "garfield": "^1.1.2",
