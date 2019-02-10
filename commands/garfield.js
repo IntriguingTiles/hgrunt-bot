@@ -10,7 +10,7 @@ exports.help = {
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
-exports.aliases = ["gf", "gar"];
+exports.aliases = ["gf"];
 
 /**
  * @param {Client} client
