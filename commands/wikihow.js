@@ -56,10 +56,10 @@ async function sendArticle(msg, article) {
 
     embed.setAuthor("wikiHow", "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png");
     embed.setTitle(await translate(title));
-    embed.setURL(await translate(url));
+    embed.setURL(url);
     embed.setColor(0x93B874);
     embed.setDescription(await translate(description));
-    embed.setImage(await translate(img));
+    embed.setImage(img);
     msg.channel.send({ embed });
     msg.channel.stopTyping();
 }
