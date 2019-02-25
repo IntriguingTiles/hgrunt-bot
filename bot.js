@@ -62,15 +62,23 @@ client.on("message", async msg => {
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
 
-    //TEMP: auto join/leave message deleter for people who use their username to advertise
-    if (msg.channel.id === "154637540341710848" && msg.embeds.length !== 0) {
-        const embed = msg.embeds[0];
+    if (msg.channel.type === "dm") {
+        // since perms remain constant in DM channels and we don't allow !config, we can skip all that stuff
+        const args = msg.content.split(" ").slice(1);
+        const cmd = msg.content.slice(defaultSettings.prefix.length).split(" ")[0];
 
-        if (embed.author.name === "Member Joined" || embed.author.name === "Member Left") {
-            if (embed.description.match(/.+\..+\/.+|twitter\/.+/g)) {
-                // probably has a URL in their name, delete the message
-                msg.delete().catch(() => { });
-            }
+        if (cmd in client.commands) {
+            if (client.commands[cmd].disabledInDMs) return msg.channel.send("That command is disabled in DMs!");
+
+            client.commands[cmd].run(client, msg, args, defaultSettings).catch(err => {
+                console.log(`Error! Command: ${msg.content}\n${err.stack}`);
+                const dev = client.users.get("221017760111656961");
+                dev.send(`Error! Command: \`${msg.content}\``);
+                dev.send(err.stack, { code: "" });
+                msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
+                if (msg.channel.typing) msg.channel.stopTyping();
+            });
+            return;
         }
     }
 
@@ -122,7 +130,7 @@ client.on("message", async msg => {
         if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send(await translate("That command is disabled!"));
         // finally run the command
         // all commands should be async
-        client.commands[cmd].run(client, msg, args).catch(err => {
+        client.commands[cmd].run(client, msg, args, guildSettings).catch(err => {
             console.log(`Error! Command: ${msg.content}\n${err.stack}`);
             const dev = client.users.get("221017760111656961");
             dev.send(`Error! Command: \`${msg.content}\``);

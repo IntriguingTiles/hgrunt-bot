@@ -7,6 +7,8 @@ exports.help = {
     info: "Configure the prefix for commands and disable commands."
 };
 
+exports.disabledInDMs = true;
+
 const blacklist = /eval|config/g;
 
 /**
@@ -15,9 +17,8 @@ const blacklist = /eval|config/g;
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
+exports.run = async (client, msg, args, guildSettings) => {
     if (msg.member.hasPermission("MANAGE_GUILD") || msg.author.id === "221017760111656961") {
-        const guildSettings = client.guildSettings.get(msg.guild.id);
         const disabledCommands = guildSettings.disabledCommands;
 
         if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });

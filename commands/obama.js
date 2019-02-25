@@ -21,9 +21,8 @@ exports.obamaDown = false;
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
+exports.run = async (client, msg, args, guildSettings) => {
     if (args.length === 0) {
-        const guildSettings = client.guildSettings.get(msg.guild.id);
         return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
     } else {
         // go and get 'em
