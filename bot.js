@@ -61,18 +61,6 @@ client.on("message", async msg => {
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
 
-    //TEMP: auto join/leave message deleter for people who use their username to advertise
-    if (msg.channel.id === "154637540341710848" && msg.embeds.length !== 0) {
-        const embed = msg.embeds[0];
-
-        if (embed.author.name === "Member Joined" || embed.author.name === "Member Left") {
-            if (embed.description.match(/.+\..+\/.+|twitter\/.+/g)) {
-                // probably has a URL in their name, delete the message
-                msg.delete().catch(() => { });
-            }
-        }
-    }
-
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
