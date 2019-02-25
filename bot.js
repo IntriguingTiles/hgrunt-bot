@@ -61,6 +61,26 @@ client.on("message", async msg => {
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
 
+    if (msg.channel.type === "dm") {
+        // since perms remain constant in DM channels and we don't allow !config, we can skip all that stuff
+        const args = msg.content.split(" ").slice(1);
+        const cmd = msg.content.slice(defaultSettings.prefix.length).split(" ")[0];
+
+        if (cmd in client.commands) {
+            if (client.commands[cmd].disabledInDMs) return msg.channel.send("That command is disabled in DMs!");
+
+            client.commands[cmd].run(client, msg, args, defaultSettings).catch(err => {
+                console.log(`Error! Command: ${msg.content}\n${err.stack}`);
+                const dev = client.users.get("221017760111656961");
+                dev.send(`Error! Command: \`${msg.content}\``);
+                dev.send(err.stack, { code: "" });
+                msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
+                if (msg.channel.typing) msg.channel.stopTyping();
+            });
+            return;
+        }
+    }
+
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
@@ -109,7 +129,7 @@ client.on("message", async msg => {
         if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
         // finally run the command
         // all commands should be async
-        client.commands[cmd].run(client, msg, args).catch(err => {
+        client.commands[cmd].run(client, msg, args, guildSettings).catch(err => {
             console.log(`Error! Command: ${msg.content}\n${err.stack}`);
             const dev = client.users.get("221017760111656961");
             dev.send(`Error! Command: \`${msg.content}\``);

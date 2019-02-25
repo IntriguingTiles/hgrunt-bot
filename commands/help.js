@@ -14,8 +14,8 @@ exports.help = {
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
-    const prefix = client.guildSettings.get(msg.guild.id).prefix;
+exports.run = async (client, msg, args, guildSettings) => {
+    const prefix = guildSettings.prefix;
     if (args.length >= 1) {
         const search = args[0].replace(prefix, "");
         for (let i = 0; i < commands.length; i++) {

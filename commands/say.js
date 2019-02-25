@@ -23,14 +23,14 @@ exports.help = {
 };
 
 exports.requiredPermissions = ["ADD_REACTIONS"];
+exports.disabledInDMs = true;
 
 /**
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
-    const guildSettings = client.guildSettings.get(msg.guild.id);
+exports.run = async (client, msg, args, guildSettings) => {
     const shouldLimit = guildSettings.limits;
     if (shouldLimit && args.length >= 20) {
         msg.react("❌").catch(() => { }); // silently fail
