@@ -26,6 +26,7 @@
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.16.4",
     "garfield": "^1.1.2",
+    "html-entities": "^1.2.1",
     "jimp": "^0.6.0",
     "moment": "^2.24.0",
     "moment-duration-format": "^2.2.2",

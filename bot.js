@@ -256,7 +256,7 @@ process.on("SIGINT", async () => {
 
 // very ugly express inline html stuff below
 server.get("/", (req, res) => {
-    let final = `<h1>NGrunt Stats</h1>
+    let final = `<h1>YGrunt Stats</h1>
 <p>Speaking in ${client.guilds.size} servers to ${client.users.size} users.<br>
 ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n<pre>`;
@@ -266,4 +266,4 @@ ${client.wordsSaid} words spoken.</p>
     res.send(final + "</pre>");
 });
 
-server.listen(1338, () => console.log("Started web server on port 1338!"));
+server.listen(1339, () => console.log("Started web server on port 1339!"));
