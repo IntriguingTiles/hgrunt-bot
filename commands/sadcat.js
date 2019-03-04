@@ -21,7 +21,7 @@ exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
     if (args.length !== 0) {
         if (msg.mentions.users.size !== 0) return sendImage(msg.mentions.users.first().displayAvatarURL, msg); // mentions
-        const idRegex = /[0-9]{18}/g;
+        const idRegex = /[0-9]+/g;
 
         if (idRegex.test(args[0])) {
             try {
