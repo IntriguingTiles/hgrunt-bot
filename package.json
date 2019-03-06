@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/IntriguingTiles/hgrunt-bot#readme",
   "dependencies": {
+    "@discordjs/uws": "^11.149.1",
     "better-sqlite-pool": "^0.2.0",
     "bufferutil": "^4.0.1",
     "cheerio": "^1.0.0-rc.2",
@@ -32,8 +33,7 @@
     "node-opus": "^0.3.1",
     "simple-git": "^1.107.0",
     "snekfetch": "^4.0.4",
-    "sodium": "github:general-programming/node-sodium",
-    "uws": "^99.0.0"
+    "sodium": "github:general-programming/node-sodium"
   },
   "devDependencies": {}
 }
