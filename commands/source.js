@@ -17,6 +17,8 @@ exports.requiredPermissions = ["ATTACH_FILES"];
 exports.run = async (client, msg, args, guildSettings) => {
     if (args.length <= 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, {code: ""});
 
+    msg.channel.startTyping();
+
     for (let i = 0; i < args.length; i++) {
         args[i] = args[i].replace(/[^a-zA-Z0-9"!`?'.,;:()[\]{}<>|/@\\^$\-%+=#_&~*]+/g, "");
     }
@@ -32,4 +34,5 @@ exports.run = async (client, msg, args, guildSettings) => {
     image.composite(logo, image.bitmap.width - logo.bitmap.width - 1, 0);
 
     msg.channel.send(new Attachment(await image.getBufferAsync(Jimp.MIME_PNG), "logo.png"));
+    msg.channel.stopTyping();
 };
