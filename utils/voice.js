@@ -56,7 +56,14 @@ exports.addLines = async (msg, lines) => {
         queueConstruct.lines.push.apply(queueConstruct.lines, lines);
 
         if (getVoiceChannel(msg)) {
-            const connection = getVoiceChannel(msg).connection ? getVoiceChannel(msg).connection : await getVoiceChannel(msg).join();
+            let connection;
+            
+            if (getVoiceChannel(msg).connection) connection = getVoiceChannel(msg).connection;
+            else {
+                connection = await getVoiceChannel(msg).join();
+                connection.on("error", console.error);
+            }
+
             queueConstruct.connection = connection;
             play(msg.guild, queueConstruct.lines[0]);
         } else {
