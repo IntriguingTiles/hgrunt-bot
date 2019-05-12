@@ -123,10 +123,12 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
     msg.react("👌").catch(() => { });
     voice.addLines(msg, lines);
 
-    rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
-    setTimeout(() => {
-        rateLimitedUsers.delete(msg.author.id);
-    }, 10000);
+    if (shouldLimit) {
+        rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
+        setTimeout(() => {
+            rateLimitedUsers.delete(msg.author.id);
+        }, 10000);
+    }
 }
 
 function getVoiceLineLocation(voiceLines) {
