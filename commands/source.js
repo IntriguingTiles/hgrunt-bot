@@ -25,6 +25,12 @@ exports.run = async (client, msg, args, guildSettings) => {
 
     if (args.join(" ").length === 0) args[0] = " ";
 
+    if (args.join(" ").length > 500) {
+        msg.channel.send("Too many characters!");
+        msg.channel.stopTyping();
+        return;
+    }
+
     const font = await Jimp.loadFont("./sourcelogo/coolvetica.fnt");
     const image = new Jimp(Jimp.measureText(font, args.join(" ")), 210);
     const logo = await Jimp.read("./sourcelogo/logo.png");
