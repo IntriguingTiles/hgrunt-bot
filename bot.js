@@ -35,7 +35,7 @@ client.login(process.env.DISCORD_TOKEN);
 
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
-    client.users.get("221017760111656961").send(err.stack);
+    if (client.readyTimestamp) client.users.get("221017760111656961").send(err.stack);
 });
 
 client.on("error", console.error);
