@@ -23,17 +23,17 @@
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^11.5.1",
     "dotenv": "^8.0.0",
-    "enmap": "^4.8.7",
+    "enmap": "^5.0.0",
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.17.1",
     "garfield": "^1.1.2",
     "jimp": "^0.6.4",
     "moment": "^2.24.0",
-    "moment-duration-format": "^2.3.1",
+    "moment-duration-format": "^2.3.2",
     "node-opus": "^0.3.2",
-    "simple-git": "^1.113.0",
+    "simple-git": "^1.120.0",
     "snekfetch": "^4.0.4",
-    "sodium": "github:general-programming/node-sodium"
+    "sodium": "^3.0.2"
   },
   "devDependencies": {}
 }
