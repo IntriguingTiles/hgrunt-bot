@@ -32,16 +32,17 @@ exports.run = async (client, msg, args, guildSettings) => {
                 return;
             }
 
-            if (!moment(args[0], moment.ISO_8601).isValid()) {
+            const date = moment(args[0], moment.ISO_8601);
+
+            if (!date.isValid()) {
                 msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, {code: ""});
                 msg.channel.stopTyping();
                 return;
             }
 
-            const date = moment(args[0], moment.ISO_8601);
 
             if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
-                msg.channel.send("You can't search for comics earlier than 1978-06-19!");
+                msg.channel.send(`You can't search for comics earlier than 1978-06-19!\nUse \`${guildSettings.prefix}jon\` to view the prototype Garfield comics.`);
                 msg.channel.stopTyping();
                 return;
             }
