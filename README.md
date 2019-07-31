@@ -11,6 +11,7 @@ Join [HGrunt Hangout](https://discord.gg/trWuQMv).
 git clone https://github.com/IntriguingTiles/hgrunt-bot.git
 cd hgrunt-bot
 mkdir gmg
+mkdir jon
 mkdir voice
 cd voice
 mkdir hgrunt
@@ -28,6 +29,8 @@ If you want Cleverbot to work, put your info from [cleverbot.io](https://cleverb
 If you want `!say` to work, grab the audio files for `hgrunt` and `vox` from Half-Life 1 and `metropolice`, `combine_soldier`, and `overwatch` from Half-Life 2. You'll also need FFmpeg.
 
 If you want `!gmg` to work, you'll have to scrape images from [garfield minus garfield](http://garfieldminusgarfield.net/) and place them in `gmg`.
+
+If you want `!jon` to work, you'll have to painstakingly screenshot comics from [this PDF](https://drive.google.com/file/d/1e6qIhEusfMgSJ9-e_R-Vgh4Vrlq93-aw/view), name them the date in ISO 8601 format, and place them in `jon`.
 
 # Credits
 - Miloteza#7639 for the custom VOX lines
