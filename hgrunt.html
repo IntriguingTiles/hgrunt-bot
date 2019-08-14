@@ -17,7 +17,7 @@
 
     <script>
         $(document).ready(function () {
-            $.getJSON('https://intriguingtiles.github.io/hgrunt-bot/data/hgrunt.json', function (data) {
+            $.getJSON('https://bot.hgrunt.xyz/data/hgrunt.json', function (data) {
                 $.each(data, function (i, f) {
                     $("<tr><td>" + f.replace(".wav", "") + "</td></tr>").appendTo("#epic tbody");
                 });
