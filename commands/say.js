@@ -110,7 +110,7 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
 
         if (!foundLine) {
             msg.react("❌").catch(() => { });
-            msg.channel.send(await translate(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://intriguingtiles.github.io/hgrunt-bot/.`));
+            msg.channel.send(await translate(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://bot.hgrunt.xyz.`));
             return;
         }
 
