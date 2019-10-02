@@ -21,7 +21,19 @@ exports.run = async (client, msg, args, guildSettings) => {
     msg.channel.startTyping();
 
     if (args.length === 0) {
-        msg.channel.send({ files: [garfield.random()] }).catch(() => msg.channel.send("Failed to get random comic!"));
+        let errCount = 0;
+
+        while (errCount < 5) {
+            try {
+                await msg.channel.send({ files: [garfield.random()] });
+                msg.channel.stopTyping();
+                return;
+            } catch (err) {
+                errCount++;
+            }
+        }
+
+        msg.channel.send("Failed to get a random comic!");
         msg.channel.stopTyping();
     } else if (args.length === 1) {
         try {
