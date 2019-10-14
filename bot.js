@@ -18,7 +18,7 @@ client.guildSettings = new Enmap({
     cloneLevel: "deep"
 });
 
-const cleverbotContexts = new Discord.Collection();
+let cleverbotContexts = new Discord.Collection();
 
 client.mSent = 0;
 client.wordsSaid = 0;
@@ -89,7 +89,8 @@ client.on("message", async msg => {
 
         try {
             if (!cleverbotContexts.has(msg.author.id)) cleverbotContexts.set(msg.author.id, []);
-            const context = cleverbotContexts.get(msg.author.id);
+            let context = cleverbotContexts.get(msg.author.id);
+            if (context.length > 50) context = [];
 
             const response = await cleverbot(msg.content.replace(prefixMention, ""), context);
 
@@ -253,6 +254,11 @@ function checkDisabledCommands(cmd, guildSettings, channelID) {
         }
     }
 }
+
+// let's clear out the cleverbot contexts every 15 minutes
+setInterval(() => {
+    cleverbotContexts = new Discord.Collection();
+}, 900000);
 
 process.on("SIGINT", async () => {
     client.guildSettings.close();
