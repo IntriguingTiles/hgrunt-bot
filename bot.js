@@ -2,15 +2,12 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const fs = require("fs");
 const Enmap = require("enmap");
-const Cleverbot = require("./utils/cleverbot.js");
+const cleverbot = require("cleverbot-free");
 const express = require("express");
 const translate = require("./utils/translate.js");
 const sleep = require("util").promisify(setTimeout);
 
 const server = express();
-
-const cleverbot = new Cleverbot(process.env.CB_USER, process.env.CB_KEY);
-cleverbot.create();
 
 const client = new Discord.Client({ disableEveryone: true });
 
@@ -20,6 +17,8 @@ client.guildSettings = new Enmap({
     autoFetch: true,
     cloneLevel: "deep"
 });
+
+const cleverbotContexts = new Discord.Collection();
 
 client.mSent = 0;
 client.wordsSaid = 0;
@@ -89,7 +88,14 @@ client.on("message", async msg => {
         msg.channel.startTyping();
 
         try {
-            const response = await cleverbot.ask(msg.content.replace(prefixMention, ""));
+            if (!cleverbotContexts.has(msg.author.id)) cleverbotContexts.set(msg.author.id, []);
+            const context = cleverbotContexts.get(msg.author.id);
+
+            const response = await cleverbot(msg.content.replace(prefixMention, ""), context);
+
+            context.push(msg.content.replace(prefixMention, ""), response);
+
+            cleverbotContexts.set(msg.author.id, context);
 
             if (msg.channel.type !== "dm") msg.channel.send(`${msg.author} ${await translate(response)}`);
             else msg.channel.send(await translate(response));
