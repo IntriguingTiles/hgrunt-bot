@@ -5,8 +5,9 @@ const Entities = require("html-entities").XmlEntities;
 const entities = new Entities();
 
 module.exports = async text => {
-    const r = await snekfetch.post("http://www.yodaspeak.co.uk/index.php").set("Content-Type", "application/x-www-form-urlencoded").set("Referer", "http://www.yodaspeak.co.uk/").attach("YodaMe", entities.encode(text));
+    const r = await snekfetch.post("http://www.yodaspeak.co.uk/webservice/yodatalk.php?wsdl").set("Content-Type", "text/xml")
+        .send(`<Envelope><Body><yodaTalk><yodaTalkRequest>${entities.encode(text)}</yodaTalkRequest></yodaTalk></Body></Envelope>`);
+    const $ = cheerio.load(r.body);
 
-const $ = cheerio.load(r.body);
-    return entities.decode($("textarea[name='YodaSpeak']").text());
+    return entities.decode($("return").text());
 };
