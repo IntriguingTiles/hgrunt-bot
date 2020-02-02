@@ -80,9 +80,6 @@ client.on("message", async msg => {
         }
     }
 
-    const args = msg.content.split(" ").slice(1);
-    const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
-
     // HACK
     if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") {
         if (cmd !== "verify" && cmd !== "jail") return;
@@ -128,6 +125,9 @@ client.on("message", async msg => {
     }
 
     if (!msg.content.startsWith(guildSettings.prefix)) return;
+
+    const args = msg.content.split(" ").slice(1);
+    const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
 
     if (cmd in client.commands) {
         // checking permissions
