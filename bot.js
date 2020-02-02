@@ -80,6 +80,12 @@ client.on("message", async msg => {
         }
     }
 
+    // HACK
+    if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") {
+        if (cmd !== "verify" && cmd !== "jail") return;
+        if (cmd in client.commands) client.commands[cmd].run(client, msg, args);
+    }
+
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
