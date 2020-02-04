@@ -1,5 +1,7 @@
 const { Client, Message, GuildMember } = require("discord.js"); // eslint-disable-line no-unused-vars
 
+exports.aliases = ["unjail"];
+
 /**
  * @param {Client} client
  * @param {Message} msg
