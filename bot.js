@@ -83,6 +83,7 @@ client.on("message", async msg => {
 
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
+        if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") return;
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
