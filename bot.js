@@ -140,7 +140,7 @@ client.on("message", async msg => {
         // all commands should be async
         // HACK
         if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") {
-            if (cmd !== "verify" && cmd !== "jail") return;
+            if (cmd !== "verify" && cmd !== "jail" && cmd !== "unjail") return;
             if (cmd in client.commands) client.commands[cmd].run(client, msg, args);
             return;
         }
