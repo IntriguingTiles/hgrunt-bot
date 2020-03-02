@@ -1,5 +1,5 @@
 const Jimp = require("jimp");
-const { Client, Message, Attachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
     name: "source",
@@ -39,6 +39,6 @@ exports.run = async (client, msg, args, guildSettings) => {
     image.contain(image.bitmap.width + 132, image.bitmap.height, Jimp.HORIZONTAL_ALIGN_LEFT);
     image.composite(logo, image.bitmap.width - logo.bitmap.width - 1, 0);
 
-    msg.channel.send(new Attachment(await image.getBufferAsync(Jimp.MIME_PNG), "logo.png"));
+    msg.channel.send(new MessageAttachment(await image.getBufferAsync(Jimp.MIME_PNG), "logo.png"));
     msg.channel.stopTyping();
 };

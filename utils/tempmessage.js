@@ -7,6 +7,6 @@ const { TextChannel } = require("discord.js"); // eslint-disable-line no-unused-
  */
 module.exports = async (channel, text, time) => {
     channel.send(text).then(msg => {
-        msg.delete(time);
+        msg.delete({ timeout: time });
     });
 };

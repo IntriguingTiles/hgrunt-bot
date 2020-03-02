@@ -6,10 +6,7 @@ require("moment-duration-format");
 const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
-const hgruntVoiceLines = fs.readdirSync("./voice/hgrunt").sort((a, b) => {
-    if (a.endsWith("!.wav")) return 1;
-    return a.localeCompare(b);
-});
+const hgruntVoiceLines = fs.readdirSync("./voice/hgrunt").reverse();
 const voxVoiceLines = fs.readdirSync("./voice/vox");
 const metrocopVoiceLines = fs.readdirSync("./voice/metropolice");
 const combineVoiceLines = fs.readdirSync("./voice/combine_soldier");
@@ -82,7 +79,7 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
         return;
     }
 
-    if (!msg.member.voiceChannel) return msg.channel.send(await translate("Join a voice channel first!"));
+    if (!msg.member.voice.channel) return msg.channel.send(await translate("Join a voice channel first!"));
     const location = getVoiceLineLocation(voiceLines);
 
     const lines = [location + firstLine];
