@@ -1,7 +1,7 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
 const translate = require("../utils/translate.js");
-const { Client, Message, RichEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message, MessageEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
     name: "wikihow",
@@ -52,7 +52,7 @@ async function sendArticle(msg, article) {
     const description = $("meta[property='og:description']").attr("content");
 
     // time to send it as an embed
-    const embed = new RichEmbed();
+    const embed = new MessageEmbed();
 
     embed.setAuthor("wikiHow", "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png");
     embed.setTitle(await translate(title));
@@ -60,6 +60,6 @@ async function sendArticle(msg, article) {
     embed.setColor(0x93B874);
     embed.setDescription(await translate(description));
     embed.setImage(img);
-    msg.channel.send({ embed });
+    msg.channel.send({ embed: embed });
     msg.channel.stopTyping();
 }

@@ -20,12 +20,12 @@ exports.aliases = ["sc"];
 exports.run = async (client, msg, args) => {
     msg.channel.startTyping();
     if (args.length !== 0) {
-        if (msg.mentions.users.size !== 0) return sendImage(msg.mentions.users.first().displayAvatarURL, msg); // mentions
+        if (msg.mentions.users.size !== 0) return sendImage(msg.mentions.users.first().displayAvatarURL({ format: "png" }), msg); // mentions
         const idRegex = /[0-9]+/g;
 
         if (idRegex.test(args[0])) {
             try {
-                return sendImage((await client.fetchUser(args[0].match(idRegex)[0])).displayAvatarURL, msg);
+                return sendImage((await client.users.fetch(args[0].match(idRegex)[0])).displayAvatarURL({ format: "png" }), msg);
             } catch (err) { /* I'm cheating */ }
         }
 
@@ -34,7 +34,7 @@ exports.run = async (client, msg, args) => {
         if (msg.attachments.size !== 0) return sendImage(msg.attachments.first().url, msg);
 
         try {
-            const msgs = await msg.channel.fetchMessages({ limit: 50 });
+            const msgs = await msg.channel.messages.fetch({ limit: 50 });
             const url = msgs.filter(msg => msg.attachments.size !== 0).find(msg => msg.attachments.first().width).attachments.first().url;
             sendImage(url, msg);
         } catch (err) {

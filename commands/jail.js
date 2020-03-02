@@ -13,11 +13,11 @@ exports.run = async (client, msg, args) => {
 
     try {
         const member = await fetchMember(client, msg, args);
-        if (member.roles.has(msg.guild.roles.find(r => r.name === "Anticitizen").id)) {
-            member.removeRole(msg.guild.roles.find(r => r.name === "Anticitizen"), `Unjailed by ${msg.author.tag}.`);
+        if (member.roles.has(msg.guild.roles.cache.find(r => r.name === "Anticitizen").id)) {
+            member.roles.remove(msg.guild.roles.cache.find(r => r.name === "Anticitizen"), `Unjailed by ${msg.author.tag}.`);
             msg.channel.send("Unjailed!");
         } else {
-            member.addRole(msg.guild.roles.find(r => r.name === "Anticitizen"), `Jailed by ${msg.author.tag}.`);
+            member.roles.add(msg.guild.roles.cache.find(r => r.name === "Anticitizen"), `Jailed by ${msg.author.tag}.`);
             msg.channel.send("Jailed!");
         }
     } catch (err) {
@@ -37,7 +37,7 @@ async function fetchMember(client, msg, args) {
 
     if (idRegex.test(args[0])) {
         try {
-            return await msg.guild.members.get(args[0].match(idRegex)[0]);
+            return await msg.guild.members.fetch(args[0].match(idRegex)[0]);
         } catch (err) { /* I'm cheating */ }
     }
     msg.channel.send("Sorry, I couldn't find that user.");
