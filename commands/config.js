@@ -116,7 +116,7 @@ exports.run = async (client, msg, args, guildSettings) => {
                         for (let i = 0; i < disabledCommands.length; i++) {
                             if (disabledCommands[i].channels.length !== 0) {
                                 const chNames = [];
-                                disabledCommands[i].channels.forEach(ch => chNames.push(`#${client.channels.get(ch).name}`));
+                                disabledCommands[i].channels.forEach(ch => chNames.push(`#${client.channels.cache.get(ch).name}`));
                                 final += `${disabledCommands[i].command} - disabled in ${chNames.join(", ")}\n`;
                             } else final += `${disabledCommands[i].command} - disabled server-wide\n`;
                         }
