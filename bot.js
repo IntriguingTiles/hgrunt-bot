@@ -188,7 +188,7 @@ client.on("guildBanAdd", async (guild, user) => {
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${user.id}`);
 
-    client.channels.get("154637540341710848").send({ embed });
+    client.channels.cache.get("154637540341710848").send({ embed });
 });
 
 client.on("guildMemberRemove", async member => {
@@ -212,7 +212,7 @@ client.on("guildMemberRemove", async member => {
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${member.user.id}`);
 
-    client.channels.get("154637540341710848").send({ embed });
+    client.channels.cache.get("154637540341710848").send({ embed });
 });
 
 client.loadCommands = () => {
