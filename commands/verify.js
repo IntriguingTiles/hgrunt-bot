@@ -10,7 +10,7 @@ exports.run = async (client, msg, args) => {
     if (!msg.member.hasPermission("KICK_MEMBERS")) return;
 
     try {
-        (await fetchMember(client, msg, args)).addRole(msg.guild.roles.find(r => r.name === "Citizen"), `Verified by ${msg.author.tag}.`);
+        (await fetchMember(client, msg, args)).roles.add(msg.guild.roles.cache.find(r => r.name === "Citizen"), `Verified by ${msg.author.tag}.`);
         msg.channel.send("Verified!");
     } catch (err) {
         msg.channel.send("Failed to add the Citizen role!");
@@ -29,7 +29,7 @@ async function fetchMember(client, msg, args) {
 
     if (idRegex.test(args[0])) {
         try {
-            return await msg.guild.members.get(args[0].match(idRegex)[0]);
+            return await msg.guild.members.fetch(args[0].match(idRegex)[0]);
         } catch (err) { /* I'm cheating */ }
     }
     msg.channel.send("Sorry, I couldn't find that user.");

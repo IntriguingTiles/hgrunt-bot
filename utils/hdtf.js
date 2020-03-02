@@ -1,5 +1,5 @@
 const Jimp = require("jimp");
-const { Client, Message, Attachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 /**
  * @param {Message} msg
@@ -37,7 +37,7 @@ module.exports = async (msg, args, banner) => {
         bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
         bannerImage.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.getBuffer(Jimp.AUTO, function (err, buffer) {
-            msg.channel.send(new Attachment(buffer, "hdtf.png"));
+            msg.channel.send(new MessageAttachment(buffer, "hdtf.png"));
         });
     });
 };

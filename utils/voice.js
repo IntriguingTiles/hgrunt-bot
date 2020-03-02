@@ -8,9 +8,9 @@ exports.queue = new Map();
  * @returns {VoiceChannel}
  */
 function getVoiceChannel(msg) {
-    if (msg.guild.voiceConnection) return msg.guild.voiceConnection.channel;
+    if (msg.guild.voice && msg.guild.voice.connection) return msg.guild.voice.channel;
 
-    const channel = msg.member.voiceChannel;
+    const channel = msg.member.voice.channel;
 
     if (!channel) {
         tempMessage(msg.channel, "Join a voice channel first!", 5000);
@@ -46,8 +46,7 @@ exports.addLines = async (msg, lines) => {
 
     if (!serverQueue) {
         const queueConstruct = {
-            textChannel: msg.channel,
-            voiceChannel: msg.member.voiceChannel,
+            voiceChannel: msg.member.voice.channel,
             connection: null,
             lines: [],
         };
@@ -57,7 +56,7 @@ exports.addLines = async (msg, lines) => {
 
         if (getVoiceChannel(msg)) {
             let connection;
-            
+
             if (getVoiceChannel(msg).connection) connection = getVoiceChannel(msg).connection;
             else {
                 connection = await getVoiceChannel(msg).join();
@@ -70,6 +69,11 @@ exports.addLines = async (msg, lines) => {
             exports.queue.delete(msg.guild.id);
         }
     } else {
+        if (!msg.guild.voice.connection) {
+            exports.queue.delete(msg.guild.id);
+            this.addLines(msg, lines);
+            return;
+        }
         serverQueue.lines.push.apply(serverQueue.lines, lines);
     }
 };
@@ -81,17 +85,19 @@ exports.addLines = async (msg, lines) => {
 function play(guild, line) {
     const serverQueue = exports.queue.get(guild.id);
 
-    if (!line) {
-        exports.queue.delete(guild.id);
-        return;
-    }
-
     const connection = serverQueue.connection;
 
-    const dispatcher = connection.playFile(`${line}`).on("end", () => {
-        serverQueue.lines.shift();
-        play(guild, serverQueue.lines[0]);
-    });
+    connection.play(`${line}`, { volume: 0.5 }).on("speaking", speaking => {
+        if (!speaking) {
+            // we're no longer speaking, next line please
+            serverQueue.lines.shift();
 
-    dispatcher.setVolume(0.5);
+            if (serverQueue.lines.length === 0) {
+                exports.queue.delete(guild.id);
+                return;
+            }
+
+            play(guild, serverQueue.lines[0]);
+        }
+    });
 }

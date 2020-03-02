@@ -34,7 +34,7 @@ client.login(process.env.DISCORD_TOKEN);
 
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
-    if (client.readyTimestamp) client.users.get("221017760111656961").send(err.stack);
+    if (client.readyTimestamp) client.users.cache.get("221017760111656961").send(err.stack);
 });
 
 client.on("error", console.error);
@@ -70,7 +70,7 @@ client.on("message", async msg => {
 
             client.commands[cmd].run(client, msg, args, defaultSettings).catch(err => {
                 console.log(`Error! Command: ${msg.content}\n${err.stack}`);
-                const dev = client.users.get("221017760111656961");
+                const dev = client.users.cache.get("221017760111656961");
                 dev.send(`Error! Command: \`${msg.content}\``);
                 dev.send(err.stack, { code: "" });
                 msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
@@ -145,7 +145,7 @@ client.on("message", async msg => {
         }
         client.commands[cmd].run(client, msg, args, guildSettings).catch(err => {
             console.log(`Error! Command: ${msg.content}\n${err.stack}`);
-            const dev = client.users.get("221017760111656961");
+            const dev = client.users.cache.get("221017760111656961");
             dev.send(`Error! Command: \`${msg.content}\``);
             dev.send(err.stack, { code: "" });
             msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
@@ -154,9 +154,9 @@ client.on("message", async msg => {
     }
 });
 
-client.on("voiceStateUpdate", (oldMember, newMember) => {
-    if (newMember.guild.voiceConnection) {
-        if (newMember.guild.voiceConnection.channel.members.filter(m => !m.user.bot).size === 0) newMember.guild.voiceConnection.channel.leave();
+client.on("voiceStateUpdate", (oldState, newState) => {
+    if (newState.guild.voice && newState.guild.voice.channel) {
+        if (newState.guild.voice.channel.members.filter(m => !m.user.bot).size === 0) newState.guild.voice.channel.leave();
     }
 });
 
@@ -167,22 +167,24 @@ client.on("guildBanAdd", async (guild, user) => {
     // waiting a second or so should prevent it from ever happening, if it even can happen.
 
     if (auditLog.action !== "MEMBER_BAN_ADD") {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
+        client.users.cache.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user}'s ban but we got the audit log for ${auditLog.action} instead!`);
         return;
     }
 
     if (auditLog.target.id !== user.id) {
-        client.users.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
+        client.users.cache.get("221017760111656961").send(`Something happened! We should've gotten the audit log for ${user} but we got the audit log for ${auditLog.target} instead!`);
         return;
     }
 
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Banned", user.displayAvatarURL);
-    embed.setThumbnail(user.displayAvatarURL);
+    const embed = new Discord.MessageEmbed();
+    embed.setAuthor("Member Banned", user.displayAvatarURL());
+    embed.setThumbnail(user.displayAvatarURL());
     embed.setColor(0xFF470F);
-    embed.addField("Member", `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, true);
-    embed.addField("Banned by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+
+    embed.addFields([{ name: "Member", value: `${user} ${Discord.Util.escapeMarkdown(user.tag)}`, inline: true },
+    { name: "Banned by", value: `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, inline: true }]);
+
+    if (auditLog.reason) embed.addFields({ name: "Reason", value: auditLog.reason });
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${user.id}`);
 
@@ -198,13 +200,15 @@ client.on("guildMemberRemove", async member => {
 
     if (auditLog.target.id !== member.user.id) return;
 
-    const embed = new Discord.RichEmbed();
-    embed.setAuthor("Member Kicked", member.user.displayAvatarURL);
-    embed.setThumbnail(member.user.displayAvatarURL);
+    const embed = new Discord.MessageEmbed();
+    embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
+    embed.setThumbnail(member.user.displayAvatarURL());
     embed.setColor(0xFF470F);
-    embed.addField("Member", `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, true);
-    embed.addField("Kicked by", `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, true);
-    if (auditLog.reason) embed.addField("Reason", auditLog.reason);
+
+    embed.addFields([{ name: "Member", value: `${member.user} ${Discord.Util.escapeMarkdown(member.user.tag)}`, inline: true },
+    { name: "Kicked by", value: `${auditLog.executor} ${Discord.Util.escapeMarkdown(auditLog.executor.tag)}`, inline: true }]);
+
+    if (auditLog.reason) embed.addFields({ name: "Reason", value: auditLog.reason });
     embed.setTimestamp(auditLog.createdAt);
     embed.setFooter(`ID: ${member.user.id}`);
 
@@ -270,6 +274,14 @@ process.on("SIGINT", async () => {
     client.guildSettings.close();
     await client.destroy();
     process.exit(0);
+});
+
+process.on("message", async msg => {
+    if (msg === "shutdown") {
+        client.guildSettings.close();
+        await client.destroy();
+        process.exit(0);
+    }
 });
 
 // very ugly express inline html stuff below
