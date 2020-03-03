@@ -13,7 +13,7 @@ exports.run = async (client, msg, args) => {
 
     try {
         const member = await fetchMember(client, msg, args);
-        if (member.roles.has(msg.guild.roles.cache.find(r => r.name === "Anticitizen").id)) {
+        if (member.roles.cache.has(msg.guild.roles.cache.find(r => r.name === "Anticitizen").id)) {
             member.roles.remove(msg.guild.roles.cache.find(r => r.name === "Anticitizen"), `Unjailed by ${msg.author.tag}.`);
             msg.channel.send("Unjailed!");
         } else {
