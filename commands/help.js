@@ -1,7 +1,4 @@
-const fs = require("fs");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
-
-const commands = fs.readdirSync("./commands/");
 
 exports.help = {
     name: "help",
@@ -18,10 +15,10 @@ exports.run = async (client, msg, args, guildSettings) => {
     const prefix = guildSettings.prefix;
     if (args.length >= 1) {
         const search = args[0].replace(prefix, "");
-        for (let i = 0; i < commands.length; i++) {
-            const cmd = require(`../commands/${commands[i]}`);
-            if ((commands[i].startsWith(search) || (cmd.aliases ? cmd.aliases.includes(search) : false)) && cmd.help) {
-                const cmd = require(`../commands/${commands[i]}`);
+        for (const command in client.commands) {
+            if (command.startsWith(search)) {
+                const cmd = client.commands[command];
+                if (!cmd.help) continue;
                 let helpText;
                 if (cmd.aliases) {
                     helpText = `\nCommand: ${prefix}${cmd.help.name}\nAliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
@@ -29,7 +26,7 @@ exports.run = async (client, msg, args, guildSettings) => {
                     helpText = `\nCommand: ${prefix}${cmd.help.name}\nUsage: ${prefix}${cmd.help.usage}\nInfo: ${cmd.help.info}`;
                 }
 
-                msg.channel.send(helpText, {code: ""});
+                msg.channel.send(helpText, { code: "" });
                 return;
             }
         }
@@ -38,13 +35,14 @@ exports.run = async (client, msg, args, guildSettings) => {
     } else {
         let final = "Commands list: \n```\n";
 
-        for (let i = 0; i < commands.length; i++) {
-            const cmd = require(`../commands/${commands[i]}`);
+        for (const command in client.commands) {
+            const cmd = client.commands[command];
             if (cmd.help) {
                 if (cmd.aliases) {
-                    final += `${prefix}${commands[i].replace(".js", "")} (aliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)})\n`;
+                    if (command !== cmd.help.name) continue;
+                    final += `${prefix}${cmd.help.name} (aliases: ${prefix}${cmd.aliases.join(`, ${prefix}`)})\n`;
                 } else {
-                    final += `${prefix}${commands[i].replace(".js", "")}\n`;
+                    final += `${prefix}${command}\n`;
                 }
             }
         }
