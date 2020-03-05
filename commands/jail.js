@@ -7,9 +7,11 @@ exports.aliases = ["unjail"];
  * @param {Message} msg
  * @param {String[]} args
  */
-exports.run = async (client, msg, args) => {
-    if (!msg.guild.id === "154305477323390976") return;
+exports.run = async (client, msg, args, guildSettings) => {
+    if (msg.guild.id !== "154305477323390976") return;
     if (!msg.member.hasPermission("KICK_MEMBERS")) return;
+
+    if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}jail <@mention or id>`, { code: "" });
 
     try {
         const member = await fetchMember(client, msg, args);
