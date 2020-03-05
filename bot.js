@@ -142,8 +142,10 @@ client.on("message", async msg => {
         if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") {
             if (cmd !== "verify" && cmd !== "jail" && cmd !== "unjail") return;
             if (cmd in client.commands) client.commands[cmd].run(client, msg, args);
+            client.commands[cmd].uses++;
             return;
         }
+        client.commands[cmd].uses++;
         client.commands[cmd].run(client, msg, args, guildSettings).catch(err => {
             console.log(`Error! Command: ${msg.content}\n${err.stack}`);
             const dev = client.users.cache.get("221017760111656961");
@@ -224,6 +226,7 @@ client.loadCommands = () => {
         if (cmd.match(/\.js$/)) {
             delete require.cache[require.resolve(`./commands/${cmd}`)];
             client.commands[cmd.slice(0, -3)] = require(`./commands/${cmd}`);
+            client.commands[cmd.slice(0, -3)].uses = 0; // let's track command usage!
             cmd = client.commands[cmd.slice(0, -3)];
             if (cmd.aliases) {
                 for (let j = 0; j < cmd.aliases.length; j++) {
@@ -288,12 +291,22 @@ process.on("message", async msg => {
 // very ugly express inline html stuff below
 server.get("/", (req, res) => {
     let final = `<h1>YGrunt Stats</h1>
-<p>Speaking in ${client.guilds.size} servers to ${client.users.size} users.<br>
+<p>Speaking in ${client.guilds.cache.size} servers to ${client.users.cache.size} users.<br>
 ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n<pre>`;
-    client.guilds.sort((a, b) => {
+    client.guilds.cache.sort((a, b) => {
         return b.memberCount - a.memberCount;
     }).forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)\n`);
+    final += "</pre><h2>Command Usage</h2>\n<pre>";
+    const cmds = [];
+    for (const cmd in client.commands) {
+        if (client.commands[cmd].aliases && client.commands[cmd].aliases.includes(cmd)) continue;
+        cmds.push({ name: cmd, uses: client.commands[cmd].uses });
+    }
+    cmds.sort((a, b) => {
+        return b.uses - a.uses;
+    }).forEach(cmd => final += `${cmd.name}: ${cmd.uses} uses\n`);
+
     res.send(final + "</pre>");
 });
 
