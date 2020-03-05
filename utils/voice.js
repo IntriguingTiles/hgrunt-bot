@@ -17,20 +17,17 @@ function getVoiceChannel(msg) {
         return;
     }
 
-    const perms = channel.permissionsFor(msg.client.user);
-
-    if (!perms.has("CONNECT")) {
-        tempMessage(msg.channel, `I don't have permission to join the voice channel \`${channel.name}\`!`, 5000);
+    if (!channel.joinable) {
+        if (channel.full) {
+            tempMessage(msg.channel, `The voice channel \`${channel.name}\` is full!`, 5000);
+        } else {
+            tempMessage(msg.channel, `I don't have permission to join the voice channel \`${channel.name}\`!`, 5000);
+        }
         return;
     }
 
-    if (!perms.has("SPEAK")) {
+    if (!channel.speakable) {
         tempMessage(msg.channel, `I don't have permission to speak in the voice channel \`${channel.name}\`!`, 5000);
-        return;
-    }
-
-    if (channel.full && !perms.has("MOVE_MEMBERS")) {
-        tempMessage(msg.channel, `The voice channel \`${channel.name}\` is full!`, 5000);
         return;
     }
 
