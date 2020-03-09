@@ -56,8 +56,13 @@ exports.addLines = async (msg, lines) => {
 
             if (getVoiceChannel(msg).connection) connection = getVoiceChannel(msg).connection;
             else {
-                connection = await getVoiceChannel(msg).join();
-                connection.on("error", console.error);
+                try {
+                    connection = await getVoiceChannel(msg).join();
+                    connection.on("error", console.error);
+                } catch (err) {
+                    msg.channel.send(`Failed to join the voice channel \`${getVoiceChannel(msg).name}\`!`);
+                    return;
+                }
             }
 
             queueConstruct.connection = connection;
