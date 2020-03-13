@@ -71,7 +71,7 @@ exports.addLines = async (msg, lines) => {
             exports.queue.delete(msg.guild.id);
         }
     } else {
-        if (!msg.guild.voice.connection) {
+        if (!msg.guild.voice) {
             exports.queue.delete(msg.guild.id);
             this.addLines(msg, lines);
             return;
