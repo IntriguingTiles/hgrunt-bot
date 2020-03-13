@@ -56,8 +56,13 @@ exports.addLines = async (msg, lines) => {
 
             if (getVoiceChannel(msg).connection) connection = getVoiceChannel(msg).connection;
             else {
-                connection = await getVoiceChannel(msg).join();
-                connection.on("error", console.error);
+                try {
+                    connection = await getVoiceChannel(msg).join();
+                    connection.on("error", console.error);
+                } catch (err) {
+                    msg.channel.send(`Failed to join the voice channel \`${getVoiceChannel(msg).name}\`!`);
+                    return;
+                }
             }
 
             queueConstruct.connection = connection;
@@ -66,7 +71,7 @@ exports.addLines = async (msg, lines) => {
             exports.queue.delete(msg.guild.id);
         }
     } else {
-        if (!msg.guild.voice.connection) {
+        if (!msg.guild.voice) {
             exports.queue.delete(msg.guild.id);
             this.addLines(msg, lines);
             return;
