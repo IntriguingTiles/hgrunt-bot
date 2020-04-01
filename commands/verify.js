@@ -12,7 +12,7 @@ exports.run = async (client, msg, args, guildSettings) => {
     if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}verify <@mention or id>`, { code: "" });
 
     try {
-        (await fetchMember(client, msg, args)).roles.add(msg.guild.roles.cache.find(r => r.name === "Citizen"), `Verified by ${msg.author.tag}.`);
+        (await fetchMember(client, msg, args)).roles.add("486241262819737610", `Verified by ${msg.author.tag}.`);
         msg.channel.send("Verified!");
     } catch (err) {
         msg.channel.send("Failed to add the Citizen role!");

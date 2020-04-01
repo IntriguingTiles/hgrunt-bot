@@ -15,11 +15,11 @@ exports.run = async (client, msg, args, guildSettings) => {
 
     try {
         const member = await fetchMember(client, msg, args);
-        if (member.roles.cache.has(msg.guild.roles.cache.find(r => r.name === "Anticitizen").id)) {
-            member.roles.remove(msg.guild.roles.cache.find(r => r.name === "Anticitizen"), `Unjailed by ${msg.author.tag}.`);
+        if (member.roles.cache.has("486241262819737610")) {
+            member.roles.remove("486241262819737610", `Unjailed by ${msg.author.tag}.`);
             msg.channel.send("Unjailed!");
         } else {
-            member.roles.add(msg.guild.roles.cache.find(r => r.name === "Anticitizen"), `Jailed by ${msg.author.tag}.`);
+            member.roles.add("486241262819737610", `Jailed by ${msg.author.tag}.`);
             msg.channel.send("Jailed!");
         }
     } catch (err) {
