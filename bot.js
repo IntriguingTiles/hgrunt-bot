@@ -68,6 +68,7 @@ client.on("message", async msg => {
         if (cmd in client.commands) {
             if (client.commands[cmd].disabledInDMs) return msg.channel.send("That command is disabled in DMs!");
 
+            client.commands[cmd].uses++;
             client.commands[cmd].run(client, msg, args, defaultSettings).catch(err => {
                 console.log(`Error! Command: ${msg.content}\n${err.stack}`);
                 const dev = client.users.cache.get("221017760111656961");
