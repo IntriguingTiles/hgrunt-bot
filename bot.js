@@ -4,6 +4,7 @@ const fs = require("fs");
 const Enmap = require("enmap");
 const cleverbot = require("cleverbot-free");
 const express = require("express");
+const translate = require("./utils/translate.js");
 const sleep = require("util").promisify(setTimeout);
 
 const server = express();
@@ -68,6 +69,7 @@ client.on("message", async msg => {
         if (cmd in client.commands) {
             if (client.commands[cmd].disabledInDMs) return msg.channel.send("That command is disabled in DMs!");
 
+            client.commands[cmd].uses++;
             client.commands[cmd].run(client, msg, args, defaultSettings).catch(err => {
                 console.log(`Error! Command: ${msg.content}\n${err.stack}`);
                 const dev = client.users.cache.get("221017760111656961");
@@ -98,10 +100,10 @@ client.on("message", async msg => {
 
             cleverbotContexts.set(msg.author.id, context);
 
-            if (msg.channel.type !== "dm") msg.channel.send(`${msg.author} ${response}`);
-            else msg.channel.send(response);
+            if (msg.channel.type !== "dm") msg.channel.send(`${msg.author} ${await translate(response)}`);
+            else msg.channel.send(await translate(response));
         } catch (err) {
-            msg.channel.send("Failed to get a response!");
+            msg.channel.send(await translate("Failed to get a response!"));
         }
 
         msg.channel.stopTyping();
@@ -129,12 +131,12 @@ client.on("message", async msg => {
         if (client.commands[cmd].requiredPermissions) {
             const perms = client.commands[cmd].requiredPermissions;
             for (let i = 0; i < perms.length; i++) {
-                if (!msg.channel.permissionsFor(client.user).has(perms[i])) return msg.channel.send(`I need permission to \`${perms[i]}\` for that command!`);
+                if (!msg.channel.permissionsFor(client.user).has(perms[i])) return msg.channel.send(await translate(`I need permission to \`${perms[i]}\` for that command!`));
             }
         }
 
         // checking disabled commands
-        if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
+        if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send(await translate("That command is disabled!"));
         // finally run the command
         // all commands should be async
         // HACK
@@ -289,7 +291,7 @@ process.on("message", async msg => {
 
 // very ugly express inline html stuff below
 server.get("/", (req, res) => {
-    let final = `<h1>HGrunt Stats</h1>
+    let final = `<h1>YGrunt Stats</h1>
 <p>Speaking in ${client.guilds.cache.size} servers to ${client.users.cache.size} users.<br>
 ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n<pre>`;
@@ -309,4 +311,4 @@ ${client.wordsSaid} words spoken.</p>
     res.send(final + "</pre>");
 });
 
-server.listen(1337, () => console.log("Started web server on port 1337!"));
+server.listen(1339, () => console.log("Started web server on port 1339!"));
