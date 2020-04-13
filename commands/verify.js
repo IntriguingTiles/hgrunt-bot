@@ -6,7 +6,7 @@ const { Client, Message, GuildMember } = require("discord.js"); // eslint-disabl
  * @param {String[]} args
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (msg.guild.id !== "154305477323390976") return;
+    if (!msg.guild || msg.guild.id !== "154305477323390976") return;
     if (!msg.member.hasPermission("KICK_MEMBERS")) return;
 
     if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}verify <@mention or id>`, { code: "" });
