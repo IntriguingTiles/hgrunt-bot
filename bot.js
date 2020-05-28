@@ -83,7 +83,6 @@ client.on("message", async msg => {
 
     if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
         // cleverbot stuff
-        if (msg.channel.type !== "dm" && msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") return;
         if (msg.author.bot && client.mSent >= 100) return;
 
         msg.channel.startTyping();
@@ -113,12 +112,7 @@ client.on("message", async msg => {
 
     if (msg.author.bot) return;
 
-    let guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
-
-    if (!guildSettings) {
-        client.guildSettings.set(msg.guild.id, defaultSettings);
-        guildSettings = client.guildSettings.get(msg.guild.id);
-    }
+    const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
 
     if (!msg.content.startsWith(guildSettings.prefix)) return;
 
@@ -138,13 +132,6 @@ client.on("message", async msg => {
         if (checkDisabledCommands(cmd, guildSettings, msg.channel.id)) return msg.channel.send("That command is disabled!");
         // finally run the command
         // all commands should be async
-        // HACK
-        if (msg.guild.id === "154305477323390976" && msg.channel.parentID !== "362516923088371722") {
-            if (cmd !== "verify" && cmd !== "jail" && cmd !== "unjail") return;
-            if (cmd in client.commands) client.commands[cmd].run(client, msg, args);
-            client.commands[cmd].uses++;
-            return;
-        }
         client.commands[cmd].uses++;
         client.commands[cmd].run(client, msg, args, guildSettings).catch(err => {
             console.log(`Error! Command: ${msg.content}\n${err.stack}`);
