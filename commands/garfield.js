@@ -1,4 +1,3 @@
-const garfield = require("garfield");
 const moment = require("moment");
 const translate = require("../utils/translate.js");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
@@ -26,7 +25,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
         while (errCount < 5) {
             try {
-                await msg.channel.send({ files: [garfield.random()] });
+                await msg.channel.send({ files: [randomComic()] });
                 msg.channel.stopTyping();
                 return;
             } catch (err) {
@@ -39,7 +38,6 @@ exports.run = async (client, msg, args, guildSettings) => {
     } else if (args.length === 1) {
         try {
             if (args[0].startsWith("l")) {
-                //console.log(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
                 await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`] });
                 msg.channel.stopTyping();
                 return;
@@ -71,3 +69,13 @@ exports.run = async (client, msg, args, guildSettings) => {
         msg.channel.stopTyping();
     }
 };
+
+function randomComic() {
+    let date;
+
+    do {
+        date = `${Math.floor(Math.random() * (new Date().getFullYear() + 1 - 1978) + 1978)}-${Math.floor(Math.random() * 12 + 1)}-${Math.floor(Math.random() * 31 + 1)}`;
+    } while (!moment(date, moment.ISO_8601).isValid() || moment(date, moment.ISO_8601).isBefore(moment("1978-06-19", moment.ISO_8601)) || moment(date, moment.ISO_8601).isAfter(moment()));
+
+    return `https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`;
+}
