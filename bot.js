@@ -5,7 +5,6 @@ const Enmap = require("enmap");
 const cleverbot = require("cleverbot-free");
 const express = require("express");
 const translate = require("./utils/translate.js");
-const sleep = require("util").promisify(setTimeout);
 
 const server = express();
 
