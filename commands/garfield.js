@@ -1,4 +1,5 @@
 const moment = require("moment");
+const snekfetch = require("snekfetch");
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
@@ -24,7 +25,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
         while (errCount < 5) {
             try {
-                await msg.channel.send({ files: [randomComic()] });
+                await msg.channel.send({ files: [await randomComic()] });
                 msg.channel.stopTyping();
                 return;
             } catch (err) {
@@ -37,6 +38,13 @@ exports.run = async (client, msg, args, guildSettings) => {
     } else if (args.length === 1) {
         try {
             if (args[0].startsWith("l")) {
+                try {
+                    await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
+                } catch (err) {
+                    msg.channel.stopTyping();
+                    return msg.channel.send("Comic for today not found.");
+                }
+
                 await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`] });
                 msg.channel.stopTyping();
                 return;
@@ -50,11 +58,17 @@ exports.run = async (client, msg, args, guildSettings) => {
                 return;
             }
 
-
             if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
                 msg.channel.send(`You can't search for comics earlier than 1978-06-19!\nUse \`${guildSettings.prefix}jon\` to view the prototype Garfield comics.`);
                 msg.channel.stopTyping();
                 return;
+            }
+
+            try {
+                await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`);
+            } catch (err) {
+                msg.channel.stopTyping();
+                return msg.channel.send("Comic not found.");
             }
 
             await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`] });
@@ -69,12 +83,14 @@ exports.run = async (client, msg, args, guildSettings) => {
     }
 };
 
-function randomComic() {
+async function randomComic() {
     let date;
 
     do {
         date = `${Math.floor(Math.random() * (new Date().getFullYear() + 1 - 1978) + 1978)}-${randomMonth()}-${randomDay()}`;
     } while (!moment(date, moment.ISO_8601).isValid() || moment(date, moment.ISO_8601).isBefore(moment("1978-06-19", moment.ISO_8601)) || moment(date, moment.ISO_8601).isAfter(moment()));
+
+    await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`);
 
     return `https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`;
 }
