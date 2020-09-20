@@ -1,6 +1,8 @@
 const moment = require("moment");
 const snekfetch = require("snekfetch");
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const cheerio = require("cheerio");
+const FileType = require("file-type");
+const { Client, Message, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
     name: "garfield",
@@ -18,6 +20,7 @@ exports.aliases = ["gf"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args, guildSettings) => {
+    let attachment;
     msg.channel.startTyping();
 
     if (args.length === 0) {
@@ -25,7 +28,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
         while (errCount < 5) {
             try {
-                await msg.channel.send({ files: [await randomComic()] });
+                await msg.channel.send(await randomComic());
                 msg.channel.stopTyping();
                 return;
             } catch (err) {
@@ -39,13 +42,13 @@ exports.run = async (client, msg, args, guildSettings) => {
         try {
             if (args[0].startsWith("l")) {
                 try {
-                    await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`);
+                    attachment = await comicOn(moment().format("YYYY-MM-DD"));
                 } catch (err) {
                     msg.channel.stopTyping();
                     return msg.channel.send("Comic for today not found.");
                 }
 
-                await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${new Date().getFullYear()}/${moment().format("YYYY-MM-DD")}.gif`] });
+                await msg.channel.send(attachment);
                 msg.channel.stopTyping();
                 return;
             }
@@ -65,13 +68,13 @@ exports.run = async (client, msg, args, guildSettings) => {
             }
 
             try {
-                await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`);
+                attachment = await comicOn(date.format("YYYY-MM-DD"));
             } catch (err) {
                 msg.channel.stopTyping();
                 return msg.channel.send("Comic not found.");
             }
 
-            await msg.channel.send({ files: [`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.year()}/${date.format("YYYY-MM-DD")}.gif`] });
+            await msg.channel.send(attachment);
             msg.channel.stopTyping();
         } catch (err) {
             if (err) msg.channel.send(err.message);
@@ -83,6 +86,34 @@ exports.run = async (client, msg, args, guildSettings) => {
     }
 };
 
+// Takes a date string in YYYY-MM-DD format, and returns a
+// MessageAttachment with that day's comic image.
+async function comicOn(date) {
+    // The direct image link seems to no longer be predictable, but it
+    // can be readily parsed out of the meta tags of the comic page.
+    let pageUrl = `https://www.gocomics.com/garfield/${date.replace(/-/g, "/")}`;
+
+    // Non-existent comics now get a 302.
+    let pageResponse = await snekfetch.get(pageUrl, {redirect: false});
+    if (pageResponse.statusCode != 200) {
+        throw new Error();
+    }
+
+    let $ = cheerio.load(pageResponse.body);
+    let imgUrl = $("meta[property='og:image']").attr("content");
+    let imgBuffer = (await snekfetch.get(imgUrl)).body;
+
+    // The URLs no longer have an extension, so they don't embed in
+    // Discord unless we change the filename.  And we might as well
+    // change it anyway, to show the date.  As far as I can tell, the
+    // old comics that existed before the redirect are still GIF but new
+    // comics are JPEG.
+    console.log(imgBuffer);
+    let imgType = FileType(imgBuffer);
+    let imgName = `${date}.${imgType.ext}`;
+    return new MessageAttachment(imgBuffer, imgName);
+}
+
 async function randomComic() {
     let date;
 
@@ -90,9 +121,7 @@ async function randomComic() {
         date = `${Math.floor(Math.random() * (new Date().getFullYear() + 1 - 1978) + 1978)}-${randomMonth()}-${randomDay()}`;
     } while (!moment(date, moment.ISO_8601).isValid() || moment(date, moment.ISO_8601).isBefore(moment("1978-06-19", moment.ISO_8601)) || moment(date, moment.ISO_8601).isAfter(moment()));
 
-    await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`);
-
-    return `https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`;
+    return await comicOn(date);
 }
 
 function randomMonth() {
