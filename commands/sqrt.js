@@ -11,6 +11,8 @@ exports.help = {
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
+exports.aliases = ["sromg"];
+
 /**
  * @param {Client} client
  * @param {Message} msg
