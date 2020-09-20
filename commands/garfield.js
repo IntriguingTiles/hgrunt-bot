@@ -102,5 +102,5 @@ function randomMonth() {
 
 function randomDay() {
     const day = Math.floor(Math.random() * 31 + 1);
-    return day.toString.length === 1 ? `0${day}` : day.toString();
+    return day.toString().length === 1 ? `0${day}` : day.toString();
 }
