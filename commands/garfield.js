@@ -86,31 +86,39 @@ exports.run = async (client, msg, args, guildSettings) => {
     }
 };
 
-// Takes a date string in YYYY-MM-DD format, and returns a
-// MessageAttachment with that day's comic image.
+/**
+ * 
+ * @param {String} date Format is YYYY-MM-DD
+ * @returns {MessageAttachment} attachment
+ */
 async function comicOn(date) {
+    // try to get the higher quality comics first
+    try {
+        const img = (await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
+        return new MessageAttachment(img, `${date}.gif`);
+    } catch (err) { /* */ }
+
     // The direct image link seems to no longer be predictable, but it
     // can be readily parsed out of the meta tags of the comic page.
-    let pageUrl = `https://www.gocomics.com/garfield/${date.replace(/-/g, "/")}`;
+    const pageUrl = `https://www.gocomics.com/garfield/${date.replace(/-/g, "/")}`;
 
     // Non-existent comics now get a 302.
-    let pageResponse = await snekfetch.get(pageUrl, {redirect: false});
-    if (pageResponse.statusCode != 200) {
+    const pageResponse = await snekfetch.get(pageUrl, {redirect: false});
+    if (pageResponse.statusCode !== 200) {
         throw new Error();
     }
 
-    let $ = cheerio.load(pageResponse.body);
-    let imgUrl = $("meta[property='og:image']").attr("content");
-    let imgBuffer = (await snekfetch.get(imgUrl)).body;
+    const $ = cheerio.load(pageResponse.body);
+    const imgUrl = $("meta[property='og:image']").attr("content");
+    const imgBuffer = (await snekfetch.get(imgUrl)).body;
 
     // The URLs no longer have an extension, so they don't embed in
     // Discord unless we change the filename.  And we might as well
     // change it anyway, to show the date.  As far as I can tell, the
     // old comics that existed before the redirect are still GIF but new
     // comics are JPEG.
-    console.log(imgBuffer);
-    let imgType = FileType(imgBuffer);
-    let imgName = `${date}.${imgType.ext}`;
+    const imgType = FileType(imgBuffer);
+    const imgName = `${date}.${imgType.ext}`;
     return new MessageAttachment(imgBuffer, imgName);
 }
 
