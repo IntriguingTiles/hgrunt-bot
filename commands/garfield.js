@@ -94,7 +94,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 async function comicOn(date) {
     // try to get the higher quality comics first
     try {
-        const img = (await snekfetch.get(`https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
+        const img = (await snekfetch.get(`https://web.archive.org/web/20190203003353if_/https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
         return new MessageAttachment(img, `${date}.gif`);
     } catch (err) { /* */ }
 
