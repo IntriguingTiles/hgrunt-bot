@@ -224,7 +224,7 @@ process.on("message", async msg => {
 // very ugly express inline html stuff below
 server.get("/", (req, res) => {
     let final = `<h1>YGrunt Stats</h1>
-<p>Speaking in ${client.guilds.cache.size} servers to ${client.users.cache.size} users.<br>
+<p>Speaking in ${client.guilds.cache.size} servers to ${client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)} users.<br>
 ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n<pre>`;
     client.guilds.cache.sort((a, b) => {
