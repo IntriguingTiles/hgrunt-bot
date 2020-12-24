@@ -45,7 +45,7 @@ client.on("ready", () => {
     client.loadCommands();
     client.user.setActivity("!help");
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
-    client.guilds.cache.forEach(guild => guild.members.fetch(guild.ownerID));
+    client.guilds.cache.forEach(guild => guild.members.fetch(guild.ownerID).catch(() => guild.members.fetch(guild.ownerID)));
 });
 
 client.on("guildCreate", async guild => {
