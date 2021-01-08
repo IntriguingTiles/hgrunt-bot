@@ -94,14 +94,20 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
             return;
         }
 
-        for (let j = 0; j < voiceLines.length; j++) {
-            const voiceLine = voiceLines[j];
-
-            if (voiceLine.startsWith(arg.toLowerCase().replace(",", "").replace(".", ""))) {
-                // found the voice line
-                lines.push(location + voiceLine);
-                foundLine = true;
-                break;
+        if (voiceLines.includes(`${arg.toLowerCase().replace(",", "").replace(".", "")}.wav`)) {
+            console.log();
+            lines.push(`${location}${arg.toLowerCase().replace(",", "").replace(".", "")}.wav`);
+            foundLine = true;
+        } else {
+            for (let j = 0; j < voiceLines.length; j++) {
+                const voiceLine = voiceLines[j];
+                
+                if (voiceLine.startsWith(arg.toLowerCase().replace(",", "").replace(".", ""))) {
+                    // found the voice line
+                    lines.push(location + voiceLine);
+                    foundLine = true;
+                    break;
+                }
             }
         }
 
