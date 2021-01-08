@@ -5,7 +5,7 @@ const Jimp = require("jimp");
 exports.help = {
     name: "tti",
     usage: "tti <text>",
-    info: "Text to image"
+    info: "Text to image. Describe the image you want generated."
 };
 
 exports.requiredPermissions = ["ATTACH_FILES"];
@@ -15,7 +15,9 @@ exports.requiredPermissions = ["ATTACH_FILES"];
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
+exports.run = async (client, msg, args, guildSettings) => {
+    if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+
     msg.channel.startTyping();
     for (let attempts = 0; attempts < 5; attempts++) {
         try {
