@@ -52,7 +52,7 @@ async function sendComic(url, msg) {
     }
 
     const $ = cheerio.load(html);
-    const img = "http://www.mezzacotta.net/" + $("img").eq(1).attr("src");
+    const img = "http://www.mezzacotta.net/" + $("img").eq(2).attr("src");
 
     msg.channel.send({ files: [img] });
     msg.channel.stopTyping();
