@@ -28,7 +28,7 @@
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.17.1",
     "jimp": "^0.12.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "moment-duration-format": "^2.3.2",
     "snekfetch": "^4.0.4",
     "sodium": "^3.0.2",
