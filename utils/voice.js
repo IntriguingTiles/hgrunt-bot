@@ -116,7 +116,7 @@ exports.addLines = async (msg, lines) => {
                         serverQueue.timeout = setTimeout(() => {
                             exports.queue.get(msg.guild.id)?.connection?.destroy();
                             exports.queue.delete(msg.guild.id);
-                        }, 30000);
+                        }, 300000);
 
                         return;
                     }
