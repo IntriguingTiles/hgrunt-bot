@@ -14,7 +14,7 @@ exports.requiredPermissions = ["ATTACH_FILES"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length <= 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, {code: ""});
+    if (args.length <= 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
 
     hdtf(msg, args, "./hdtf/banner.png");
 };

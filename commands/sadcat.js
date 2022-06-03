@@ -17,7 +17,7 @@ exports.aliases = ["sc"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
     if (args.length !== 0) {
         if (msg.mentions.users.size !== 0) return sendImage(msg.mentions.users.first().displayAvatarURL({ format: "png" }), msg); // mentions
         const idRegex = /[0-9]+/g;
@@ -38,7 +38,6 @@ exports.run = async (client, msg, args) => {
             sendImage(url, msg);
         } catch (err) {
             msg.channel.send("Failed to find an image in the last 50 messages!");
-            msg.channel.stopTyping();
         }
     }
 };
@@ -60,5 +59,4 @@ async function sendImage(url, msg) {
         msg.channel.send("Bad URL or not an image!");
     }
 
-    msg.channel.stopTyping();
 }

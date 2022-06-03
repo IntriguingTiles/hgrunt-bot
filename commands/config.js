@@ -17,7 +17,7 @@ const blacklist = /eval|config/g;
  * @param {string[]} args
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (msg.member.hasPermission("MANAGE_GUILD") || msg.author.id === "221017760111656961") {
+    if (msg.member.permissions.has("MANAGE_GUILD") || msg.author.id === "221017760111656961") {
         const disabledCommands = guildSettings.disabledCommands;
 
         if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
@@ -41,7 +41,7 @@ exports.run = async (client, msg, args, guildSettings) => {
                     msg.channel.send("Limits disabled!");
                 }
                 break;
-            case "cmd": // do not look at this part if you value your sanity. i actually have no idea how this code works anymore.
+            case "cmd":
                 switch (args[1]) {
                     case "disable":
                         if (args.length < 3) return msg.channel.send(`Usage: ${guildSettings.prefix}config cmd disable [server] <cmd>`, { code: "" });

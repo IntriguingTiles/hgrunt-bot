@@ -18,23 +18,20 @@ exports.aliases = ["igmg"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
 
     if (args[0]) {
-        msg.channel.send({ files: ["./nogf.png"]});
-        msg.channel.stopTyping();
+        msg.channel.send({ files: ["./nogf.png"] });
         return;
     }
 
     const html = (await snekfetch.get("http://garfield.zweistein.cz/")).body;
     if (!html) {
         msg.channel.send("Failed to get comic!");
-        msg.channel.stopTyping();
     }
 
     const $ = cheerio.load(html);
     const img = "http://garfield.zweistein.cz/" + $("img").first().attr("src");
 
     msg.channel.send({ files: [img] });
-    msg.channel.stopTyping();
 };

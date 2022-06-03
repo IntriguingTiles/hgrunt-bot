@@ -18,7 +18,7 @@ exports.aliases = ["wh"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
     if (args.length > 0) {
         // use the mediawiki api to search for an article
         const search = encodeURIComponent(args.join(" "));
@@ -26,7 +26,6 @@ exports.run = async (client, msg, args) => {
 
         if (!results.data[0]) {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
-            return msg.channel.stopTyping();
         }
 
         sendArticle(msg, results.data[0].url);
@@ -41,24 +40,31 @@ exports.run = async (client, msg, args) => {
  * @param {string} article 
  */
 async function sendArticle(msg, article) {
-    const html = (await snekfetch.get(article)).body;
-    const $ = cheerio.load(html);
+    for (let i = 0; i < 5; i++) {
+        try {
+            const html = (await snekfetch.get(article)).body;
+            const $ = cheerio.load(html);
 
-    // we can get the data we need from things in <head>
-    const title = $("meta[property='og:title']").attr("content");
-    const url = $("meta[property='og:url']").attr("content");
-    const img = $("meta[property='og:image']").attr("content");
-    const description = $("meta[property='og:description']").attr("content");
+            // we can get the data we need from things in <head>
+            const title = $("meta[property='og:title']").attr("content");
+            const url = $("meta[property='og:url']").attr("content");
+            const img = $("meta[property='og:image']").attr("content");
+            const description = $("meta[property='og:description']").attr("content");
 
-    // time to send it as an embed
-    const embed = new MessageEmbed();
-
-    embed.setAuthor("wikiHow", "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png");
-    embed.setTitle(title);
-    embed.setURL(url);
-    embed.setColor(0x93B874);
-    embed.setDescription(description);
-    embed.setImage(img);
-    msg.channel.send({ embed: embed });
-    msg.channel.stopTyping();
+            // time to send it as an embed
+            const embed = new MessageEmbed();
+            embed.setAuthor({ name: "wikiHow", iconURL: "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png" });
+            embed.setTitle(title);
+            embed.setURL(url);
+            embed.setColor(0x93B874);
+            embed.setDescription(description);
+            embed.setImage(img);
+            msg.channel.send({ embeds: [embed] });
+            return;
+        } catch (err) {
+            //
+        }
+    }
+    msg.channel.send("Failed to find article.");
+    msg.client.users.cache.get("221017760111656961").send(`\`${msg.content}\`, \`${article}\``);
 }

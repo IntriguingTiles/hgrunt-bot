@@ -18,7 +18,7 @@ exports.requiredPermissions = ["ATTACH_FILES"];
 exports.run = async (client, msg, args, guildSettings) => {
     if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
 
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
     for (let attempts = 0; attempts < 5; attempts++) {
         try {
             const request = await snekfetch.post("https://vision-explorer.allenai.org/api/xlxmert").attach("params", JSON.stringify({ caption: args.join(" ") }));
@@ -29,13 +29,11 @@ exports.run = async (client, msg, args, guildSettings) => {
                 this.bitmap.data[idx + 2] = request.body.answer.image[y][x][2];
                 this.bitmap.data[idx + 3] = 0xFF;
             });
-            msg.channel.stopTyping();
             await msg.channel.send({ files: [await img.getBufferAsync(Jimp.AUTO)] });
             return;
         } catch (err) {
             // cheating
         }
     }
-    msg.channel.stopTyping();
     msg.channel.send("Failed to generate image.");
 };

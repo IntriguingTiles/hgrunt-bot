@@ -37,7 +37,7 @@ module.exports = async (msg, args, banner) => {
         bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
         bannerImage.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.getBuffer(Jimp.AUTO, function (err, buffer) {
-            msg.channel.send(new MessageAttachment(buffer, "hdtf.png"));
+            msg.channel.send({ files: [new MessageAttachment(buffer, "hdtf.png")] });
         });
     });
 };

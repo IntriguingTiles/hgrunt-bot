@@ -17,12 +17,13 @@
   },
   "homepage": "https://github.com/IntriguingTiles/hgrunt-bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.3.3",
+    "@discordjs/opus": "^0.7.0",
+    "@discordjs/voice": "^0.9.0",
     "better-sqlite3": "^7.1.2",
     "bufferutil": "^4.0.3",
     "cheerio": "^1.0.0-rc.5",
     "cleverbot-free": "^1.0.5",
-    "discord.js": "^12.5.1",
+    "discord.js": "^13.0.0",
     "dotenv": "^8.2.0",
     "enmap": "^5.8.2",
     "erlpack": "github:discordapp/erlpack",
@@ -31,9 +32,8 @@
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "snekfetch": "^4.0.4",
-    "sodium": "^3.0.2",
+    "sodium-native": "^3.3.0",
     "utf-8-validate": "^5.0.4",
     "zlib-sync": "^0.1.7"
-  },
-  "devDependencies": {}
+  }
 }

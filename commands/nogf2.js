@@ -21,5 +21,5 @@ exports.aliases = ["gmg"];
 exports.run = async (client, msg) => {
     const strip = "./gmg/" + strips[Math.floor(Math.random() * strips.length)];
 
-    msg.channel.send({files: [strip]});
+    msg.channel.send({ files: [strip] });
 };
