@@ -26,15 +26,17 @@ exports.run = async (client, msg, args, guildSettings) => {
         return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
     } else {
         // go and get 'em
-        msg.channel.startTyping();
+        msg.channel.sendTyping();
         const words = args.join(" ");
         let request;
+
         try {
             request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
         } catch (err) {
             msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg);
-            return msg.channel.stopTyping();
+            return;
         }
+
         //console.log(request.headers.location);
         const videoURLBase = `http://talkobamato.me/synth/output/${request.headers.location.split("=")[1]}`;
         const videoURL = `${videoURLBase}/obama.mp4`;
@@ -48,6 +50,5 @@ exports.run = async (client, msg, args, guildSettings) => {
         }
         // video should be done now, send it
         msg.channel.send({ files: [videoURL] }).catch(async () => msg.channel.send(exports.obamaDown ? await translate(obamaDownMsg) : await translate(errorMsg)));
-        msg.channel.stopTyping();
     }
 };

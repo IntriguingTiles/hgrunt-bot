@@ -8,7 +8,10 @@ const translate = require("./utils/translate.js");
 
 const server = express();
 
-const client = new Discord.Client({ disableEveryone: true });
+const client = new Discord.Client({
+    intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES, Discord.Intents.FLAGS.GUILD_VOICE_STATES],
+    partials: ["MESSAGE", "CHANNEL"]
+});
 
 client.guildSettings = new Enmap({
     name: "guildSettings",
@@ -41,11 +44,11 @@ client.on("error", console.error);
 client.on("warn", console.warn);
 
 client.on("ready", () => {
-    console.log(`Logged in as ${client.user.username}`);
+    console.log(`Logged in as ${client.user.tag}`);
     client.loadCommands();
     client.user.setActivity("!help");
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
-    client.guilds.cache.forEach(guild => guild.members.fetch(guild.ownerID).catch(() => guild.members.fetch(guild.ownerID)));
+    client.guilds.cache.forEach(guild => guild.members.fetch(guild.ownerId).catch(() => guild.members.fetch(guild.ownerId)));
 });
 
 client.on("guildCreate", async guild => {
@@ -56,12 +59,28 @@ client.on("guildDelete", async guild => {
     client.guildSettings.delete(guild.id);
 });
 
-client.on("message", async msg => {
-    if (msg.channel.type !== "dm" ? !msg.channel.permissionsFor(client.user).has("SEND_MESSAGES") : false) return;
+client.on("messageCreate", async msg => {
+    if (msg.partial) {
+        try {
+            msg = await msg.fetch();
+        } catch (err) {
+            return;
+        }
+    }
+
+    if (msg.channel.partial) {
+        try {
+            await msg.channel.fetch();
+        } catch (err) {
+            return;
+        }
+    }
+
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
+    if (msg.channel.type !== "DM" && !msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
-    if (msg.channel.type === "dm") {
+    if (msg.channel.type === "DM") {
         // since perms remain constant in DM channels and we don't allow !config, we can skip all that stuff
         const args = msg.content.split(" ").slice(1);
         const cmd = msg.content.slice(defaultSettings.prefix.length).split(" ")[0];
@@ -76,17 +95,16 @@ client.on("message", async msg => {
                 dev.send(`Error! Command: \`${msg.content}\``);
                 dev.send(err.stack, { code: "" });
                 msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
-                if (msg.channel.typing) msg.channel.stopTyping();
             });
             return;
         }
     }
 
-    if (prefixMention.test(msg.content) || (msg.channel.type === "dm" && !msg.author.bot)) {
+    if (prefixMention.test(msg.content) || (msg.channel.type === "DM" && !msg.author.bot)) {
         // cleverbot stuff
         if (msg.author.bot && client.mSent >= 100) return;
 
-        msg.channel.startTyping();
+        msg.channel.sendTyping();
 
         try {
             if (!cleverbotContexts.has(msg.author.id)) cleverbotContexts.set(msg.author.id, []);
@@ -99,13 +117,11 @@ client.on("message", async msg => {
 
             cleverbotContexts.set(msg.author.id, context);
 
-            if (msg.channel.type !== "dm") msg.channel.send(`${msg.author} ${await translate(response)}`);
+            if (msg.channel.type !== "DM") msg.channel.send(`${msg.author} ${await translate(response)}`);
             else msg.channel.send(await translate(response));
         } catch (err) {
             msg.channel.send(await translate("Failed to get a response!"));
         }
-
-        msg.channel.stopTyping();
 
         if (msg.author.bot) client.mSent++;
         return;
@@ -140,14 +156,7 @@ client.on("message", async msg => {
             dev.send(`Error! Command: \`${msg.content}\``);
             dev.send(err.stack, { code: "" });
             msg.channel.send(`An error occured while running that command! More info: ${err.message}.`);
-            if (msg.channel.typing) msg.channel.stopTyping();
         });
-    }
-});
-
-client.on("voiceStateUpdate", (oldState, newState) => {
-    if (newState.guild.voice && newState.guild.voice.channel) {
-        if (newState.guild.voice.channel.members.filter(m => !m.user.bot).size === 0) newState.guild.voice.channel.leave();
     }
 });
 
@@ -161,6 +170,9 @@ client.loadCommands = () => {
             client.commands[cmd.slice(0, -3)] = require(`./commands/${cmd}`);
             client.commands[cmd.slice(0, -3)].uses = 0; // let's track command usage!
             cmd = client.commands[cmd.slice(0, -3)];
+
+            if (cmd.init) cmd.init(client);
+
             if (cmd.aliases) {
                 for (let j = 0; j < cmd.aliases.length; j++) {
                     client.commands[cmd.aliases[j]] = cmd;
@@ -229,7 +241,7 @@ ${client.wordsSaid} words spoken.</p>
 <h2>Server List</h2>\n<pre>`;
     client.guilds.cache.sort((a, b) => {
         return b.memberCount - a.memberCount;
-    }).forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)\n`);
+    }).forEach(guild => final += `${guild.name} (${guild.memberCount} members)\n`);
     final += "</pre><h2>Command Usage</h2>\n<pre>";
     const cmds = [];
     for (const cmd in client.commands) {

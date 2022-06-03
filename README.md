@@ -1,7 +1,7 @@
 # hgrunt-bot
 This is a discord.js bot that can play hgrunt/VOX lines in a voice channel, generate HDTF banners, get garfield comics, and more.
 
-[Add HGrunt](https://discordapp.com/oauth2/authorize/?permissions=3196992&scope=bot&client_id=396884008501510144)
+[Add HGrunt](https://discord.com/api/oauth2/authorize?client_id=396884008501510144&permissions=0&scope=bot%20applications.commands)
 
 # Support
 Join [HGrunt Hangout](https://discord.gg/trWuQMv).

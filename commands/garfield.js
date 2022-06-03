@@ -22,15 +22,14 @@ exports.aliases = ["gf"];
  */
 exports.run = async (client, msg, args, guildSettings) => {
     let attachment;
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
 
     if (args.length === 0) {
         let errCount = 0;
 
         while (errCount < 5) {
             try {
-                await msg.channel.send(await randomComic());
-                msg.channel.stopTyping();
+                await msg.channel.send({ files: [await randomComic()] });
                 return;
             } catch (err) {
                 errCount++;
@@ -38,52 +37,43 @@ exports.run = async (client, msg, args, guildSettings) => {
         }
 
         msg.channel.send(await translate("Failed to get a random comic!"));
-        msg.channel.stopTyping();
     } else if (args.length === 1) {
         try {
             if (args[0].startsWith("l")) {
                 try {
                     attachment = await comicOn(moment().format("YYYY-MM-DD"));
                 } catch (err) {
-                    msg.channel.stopTyping();
                     return msg.channel.send(await translate("Comic for today not found."));
                 }
 
-                await msg.channel.send(attachment);
-                msg.channel.stopTyping();
+                await msg.channel.send({ files: [attachment] });
                 return;
             }
 
             const date = moment(args[0], moment.ISO_8601);
 
             if (!date.isValid()) {
-                msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, {code: ""});
-                msg.channel.stopTyping();
+                msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
                 return;
             }
 
             if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
                 msg.channel.send(await translate(`You can't search for comics earlier than 1978-06-19!\nUse \`${guildSettings.prefix}jon\` to view the prototype Garfield comics.`));
-                msg.channel.stopTyping();
                 return;
             }
 
             try {
                 attachment = await comicOn(date.format("YYYY-MM-DD"));
             } catch (err) {
-                msg.channel.stopTyping();
                 return msg.channel.send(await translate("Comic not found."));
             }
 
-            await msg.channel.send(attachment);
-            msg.channel.stopTyping();
+            await msg.channel.send({ files: [attachment] });
         } catch (err) {
             if (err) msg.channel.send(err.message);
-            msg.channel.stopTyping();
         }
     } else {
-        msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, {code: ""});
-        msg.channel.stopTyping();
+        msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
     }
 };
 
@@ -104,7 +94,7 @@ async function comicOn(date) {
     const pageUrl = `https://www.gocomics.com/garfield/${date.replace(/-/g, "/")}`;
 
     // Non-existent comics now get a 302.
-    const pageResponse = await snekfetch.get(pageUrl, {redirect: false});
+    const pageResponse = await snekfetch.get(pageUrl, { redirect: false });
     if (pageResponse.statusCode !== 200) {
         throw new Error();
     }

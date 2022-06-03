@@ -19,7 +19,7 @@ exports.aliases = ["sromg"];
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
 
     let url = "http://www.mezzacotta.net";
 
@@ -36,7 +36,6 @@ exports.run = async (client, msg, args) => {
 
         if (!comic) {
             msg.channel.send(await translate("No comic was found for `" + args[0] + "` - check the date format (YYYY-MM-DD)"));
-            msg.channel.stopTyping();
             return;
         }
 
@@ -49,12 +48,10 @@ async function sendComic(url, msg) {
     const html = (await snekfetch.get(url)).body;
     if (!html) {
         msg.channel.send("Failed to get comic!");
-        msg.channel.stopTyping();
     }
 
     const $ = cheerio.load(html);
     const img = "http://www.mezzacotta.net/" + $("img").eq(2).attr("src");
 
     msg.channel.send({ files: [img] });
-    msg.channel.stopTyping();
 }

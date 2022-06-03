@@ -24,6 +24,13 @@ exports.requiredPermissions = ["ADD_REACTIONS"];
 exports.disabledInDMs = true;
 
 /**
+ * @param {Client} client 
+ */
+exports.init = client => {
+    voice.init(client);
+};
+
+/**
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
@@ -95,13 +102,12 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
         }
 
         if (voiceLines.includes(`${arg.toLowerCase().replace(",", "").replace(".", "")}.wav`)) {
-            console.log();
             lines.push(`${location}${arg.toLowerCase().replace(",", "").replace(".", "")}.wav`);
             foundLine = true;
         } else {
             for (let j = 0; j < voiceLines.length; j++) {
                 const voiceLine = voiceLines[j];
-                
+
                 if (voiceLine.startsWith(arg.toLowerCase().replace(",", "").replace(".", ""))) {
                     // found the voice line
                     lines.push(location + voiceLine);
@@ -136,10 +142,10 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
 
 function getVoiceLineLocation(voiceLines) {
     switch (voiceLines) {
-        case hgruntVoiceLines:      return "./voice/hgrunt/";
-        case voxVoiceLines:         return "./voice/vox/";
-        case metrocopVoiceLines:    return "./voice/metropolice/";
-        case combineVoiceLines:     return "./voice/combine_soldier/";
-        case overwatchVoiceLines:   return "./voice/overwatch/";
+        case hgruntVoiceLines: return "./voice/hgrunt/";
+        case voxVoiceLines: return "./voice/vox/";
+        case metrocopVoiceLines: return "./voice/metropolice/";
+        case combineVoiceLines: return "./voice/combine_soldier/";
+        case overwatchVoiceLines: return "./voice/overwatch/";
     }
 }

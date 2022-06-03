@@ -22,7 +22,7 @@ fillComicList();
  * @param {string[]} args
  */
 exports.run = async (client, msg, args) => {
-    msg.channel.startTyping();
+    msg.channel.sendTyping();
     if (args.length === 0) {
         // random comic
         sendComic(comicList.random(), msg);
@@ -31,7 +31,7 @@ exports.run = async (client, msg, args) => {
         const comic = comicList.get(comicList.keyArray().find(comic => comic.includes(args.join(" ").toLowerCase())));
         if (!comic) {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
-            return msg.channel.stopTyping();
+            return;
         }
         sendComic(comic, msg);
     }
@@ -42,7 +42,6 @@ async function sendComic(comic, msg) {
     const $ = cheerio.load(html);
 
     msg.channel.send({ files: [$(".page-image").first().attr("src")] });
-    msg.channel.stopTyping();
 }
 
 async function fillComicList() {
