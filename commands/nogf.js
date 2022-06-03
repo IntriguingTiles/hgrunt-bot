@@ -28,6 +28,7 @@ exports.run = async (client, msg, args) => {
     const html = (await snekfetch.get("http://garfield.zweistein.cz/")).body;
     if (!html) {
         msg.channel.send("Failed to get comic!");
+        return;
     }
 
     const $ = cheerio.load(html);

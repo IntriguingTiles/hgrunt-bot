@@ -26,6 +26,7 @@ exports.run = async (client, msg, args) => {
 
         if (!results.data[0]) {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            return;
         }
 
         sendArticle(msg, results.data[0].url);

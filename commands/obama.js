@@ -28,11 +28,14 @@ exports.run = async (client, msg, args, guildSettings) => {
         msg.channel.sendTyping();
         const words = args.join(" ");
         let request;
+
         try {
             request = await snekfetch.post("http://talkobamato.me/synthesize.py", { redirect: false }).attach("input_text", words);
         } catch (err) {
             msg.channel.send(exports.obamaDown ? obamaDownMsg : errorMsg);
+            return;
         }
+
         //console.log(request.headers.location);
         const videoURLBase = `http://talkobamato.me/synth/output/${request.headers.location.split("=")[1]}`;
         const videoURL = `${videoURLBase}/obama.mp4`;

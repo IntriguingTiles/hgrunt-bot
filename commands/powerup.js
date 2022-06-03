@@ -31,6 +31,7 @@ exports.run = async (client, msg, args) => {
         const comic = comicList.get(comicList.keyArray().find(comic => comic.includes(args.join(" ").toLowerCase())));
         if (!comic) {
             msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            return;
         }
         sendComic(comic, msg);
     }
