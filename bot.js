@@ -45,6 +45,13 @@ client.on("warn", console.warn);
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
+
+    if (client.user.id !== "396884008501510144") {
+        console.log("Running in development mode, slash commands will be registered per-guild");
+    } else {
+        console.log("Running in production mode, slash commands will be registered globally");
+    }
+
     client.loadCommands();
     client.user.setActivity("with slash commands");
     prefixMention = new RegExp(`^<@!?${client.user.id}> `);
