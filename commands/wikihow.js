@@ -1,12 +1,16 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
-const { Client, Message, MessageEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder, EmbedBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "wikihow",
-    usage: "wikihow [search]",
-    info: "Gets a random article or searches for an article from wikiHow."
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("wikihow")
+        .setDescription("View articles from wikiHow.")
+        .addStringOption(option =>
+            option.setName("search")
+                .setDescription("The article to search for."))
+];
 
 exports.requiredPermissions = ["EMBED_LINKS"];
 
@@ -14,33 +18,33 @@ exports.aliases = ["wh"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args) => {
-    msg.channel.sendTyping();
-    if (args.length > 0) {
+exports.run = async (client, intr, guildSettings) => {
+    const search = intr.options.getString("search", false);
+
+    if (search) {
         // use the mediawiki api to search for an article
-        const search = encodeURIComponent(args.join(" "));
-        const results = (await snekfetch.get(`https://www.wikihow.com/api.php?action=titlesearch&q=${search}&safeSearch=0&format=json`)).body; // gives us json we can work with
+        const encSearch = encodeURIComponent(search);
+        const results = (await snekfetch.get(`https://www.wikihow.com/api.php?action=titlesearch&q=${encSearch}&safeSearch=0&format=json`)).body; // gives us json we can work with
 
         if (!results.data[0]) {
-            msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            intr.reply({ content: `No results found for \`${search}\`!`, ephemeral: true });
             return;
         }
 
-        sendArticle(msg, results.data[0].url);
+        sendArticle(intr, results.data[0].url, guildSettings);
     } else {
         // random
-        sendArticle(msg, "https://www.wikihow.com/Special:Randomizer");
+        sendArticle(intr, "https://www.wikihow.com/Special:Randomizer", guildSettings);
     }
 };
 
 /**
- * @param {Message} msg 
+ * @param {ChatInputCommandInteraction} intr 
  * @param {string} article 
  */
-async function sendArticle(msg, article) {
+async function sendArticle(intr, article, guildSettings) {
     for (let i = 0; i < 5; i++) {
         try {
             const html = (await snekfetch.get(article)).body;
@@ -53,19 +57,19 @@ async function sendArticle(msg, article) {
             const description = $("meta[property='og:description']").attr("content");
 
             // time to send it as an embed
-            const embed = new MessageEmbed();
+            const embed = new EmbedBuilder();
             embed.setAuthor({ name: "wikiHow", iconURL: "https://www.wikihow.com/skins/WikiHow/wH-initials_152x152.png" });
             embed.setTitle(title);
             embed.setURL(url);
             embed.setColor(0x93B874);
             embed.setDescription(description);
             embed.setImage(img);
-            msg.channel.send({ embeds: [embed] });
+            intr.reply({ embeds: [embed], ephemeral: guildSettings.ephemeral });
             return;
         } catch (err) {
             //
         }
     }
-    msg.channel.send("Failed to find article.");
-    msg.client.users.cache.get("221017760111656961").send(`\`${msg.content}\`, \`${article}\``);
+
+    intr.reply({ content: "Failed to find article.", ephemeral: true });
 }

@@ -8,7 +8,7 @@ const { Client, Message } = require("discord.js");
  * @param {Message} msg
  * @param {string[]} args
  */
-exports.run = async (client, msg, args) => {
+ exports.run = async (client, msg, args, guildSettings) => {
     if (msg.author.id !== "221017760111656961") return;
 
     try {
@@ -18,7 +18,7 @@ exports.run = async (client, msg, args) => {
         if (typeof evaled !== "string")
             evaled = require("util").inspect(evaled);
 
-        msg.channel.send(clean(evaled), { code: "xl" }).catch(err => msg.channel.send("Result too big to send."));
+        msg.channel.send(`\`\`\`xl\n${clean(evaled)}\`\`\``).catch(err => msg.channel.send("Result too big to send."));
     } catch (err) {
         msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
     }

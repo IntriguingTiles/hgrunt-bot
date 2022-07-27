@@ -1,12 +1,13 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "nogf",
-    usage: "nogf",
-    info: "Jon is a broken man"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("nogf")
+        .setDescription("View a randomly generated Garfield minus Garfield comic.")
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
@@ -14,25 +15,17 @@ exports.aliases = ["igmg"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args) => {
-    msg.channel.sendTyping();
-
-    if (args[0]) {
-        msg.channel.send({ files: ["./nogf.png"] });
-        return;
-    }
-
+exports.run = async (client, intr, guildSettings) => {
     const html = (await snekfetch.get("http://garfield.zweistein.cz/")).body;
     if (!html) {
-        msg.channel.send("Failed to get comic!");
+        intr.reply({ content: "Failed to get comic!", ephemeral: true });
         return;
     }
 
     const $ = cheerio.load(html);
     const img = "http://garfield.zweistein.cz/" + $("img").first().attr("src");
 
-    msg.channel.send({ files: [img] });
+    intr.reply({ files: [img], ephemeral: guildSettings.ephemeral });
 };

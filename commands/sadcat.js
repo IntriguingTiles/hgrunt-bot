@@ -1,11 +1,33 @@
 const Jimp = require("jimp");
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "sadcat",
-    usage: "sadcat <image, url, or mention>",
-    info: "sad kitty"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("sadcat")
+        .setDescription("Overlays the sad kitty on top of a given image.")
+        .addSubcommand(cmd =>
+            cmd.setName("user")
+                .setDescription("Overlays the sad kitty on top of the specified user's profile picture.")
+                .addUserOption(option =>
+                    option.setName("user")
+                        .setDescription("The user.")
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("image")
+                .setDescription("Overlays the sad kitty on top of the provided image.")
+                .addAttachmentOption(option =>
+                    option.setName("image")
+                        .setDescription("The image.")
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("url")
+                .setDescription("Overlays the sad kitty on top of the specified image URL.")
+                .addStringOption(option =>
+                    option.setName("url")
+                        .setDescription("The URL.")
+                        .setRequired(true)))
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
@@ -13,40 +35,24 @@ exports.aliases = ["sc"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args) => {
-    msg.channel.sendTyping();
-    if (args.length !== 0) {
-        if (msg.mentions.users.size !== 0) return sendImage(msg.mentions.users.first().displayAvatarURL({ format: "png" }), msg); // mentions
-        const idRegex = /[0-9]+/g;
-
-        if (idRegex.test(args[0])) {
-            try {
-                return sendImage((await client.users.fetch(args[0].match(idRegex)[0])).displayAvatarURL({ format: "png" }), msg);
-            } catch (err) { /* I'm cheating */ }
-        }
-
-        sendImage(args[0], msg);
-    } else {
-        if (msg.attachments.size !== 0) return sendImage(msg.attachments.first().url, msg);
-
-        try {
-            const msgs = await msg.channel.messages.fetch({ limit: 50 });
-            const url = msgs.filter(msg => msg.attachments.size !== 0).find(msg => msg.attachments.first().width).attachments.first().url;
-            sendImage(url, msg);
-        } catch (err) {
-            msg.channel.send("Failed to find an image in the last 50 messages!");
-        }
+exports.run = async (client, intr, guildSettings) => {
+    switch (intr.options.getSubcommand()) {
+        case "user":
+            return sendImage(intr.options.getUser("user").displayAvatarURL({ extension: "png", size: 512 }), intr, guildSettings);
+        case "image":
+            return sendImage(intr.options.getAttachment("image").url, intr, guildSettings);
+        case "url":
+            return sendImage(intr.options.getString("url"), intr, guildSettings);
     }
 };
 
 /**
  * @param {string} url 
- * @param {Message} msg
+ * @param {ChatInputCommandInteraction} intr
  */
-async function sendImage(url, msg) {
+async function sendImage(url, intr, guildSettings) {
     try {
         const finalImg = new Jimp(720, 960, 0x000000FF); // new black image
         const sadCat = await Jimp.read("./sadcat.png");
@@ -54,9 +60,9 @@ async function sendImage(url, msg) {
         img.scaleToFit(501, 382);
         finalImg.composite(img, 0, 207);
         finalImg.composite(sadCat, 0, 0);
-        await msg.channel.send({ files: [await finalImg.getBufferAsync(Jimp.AUTO)] });
+        await intr.reply({ files: [await finalImg.getBufferAsync(Jimp.AUTO)], ephemeral: guildSettings.ephemeral });
     } catch (err) {
-        msg.channel.send("Bad URL or not an image!");
+        intr.reply({ content: "Bad URL or not an image!", ephemeral: true });
     }
 
 }

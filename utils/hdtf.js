@@ -1,13 +1,13 @@
 const Jimp = require("jimp");
-const { Client, Message, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction, AttachmentBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 /**
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  * @param {string} banner
  */
-module.exports = async (msg, args, banner) => {
+module.exports = async (intr, banner, guildSettings) => {
     let realLength = 0;
+    const args = intr.options.getString("text").split(" ");
 
     for (let i = 0; i < args.length; i++) {
         args[i] = args[i].replace(/[^a-zA-Z0-9.,'\-!?]+/g, "");
@@ -31,13 +31,14 @@ module.exports = async (msg, args, banner) => {
             }
             currentX += 34;
         }
+
         const bannerImage = await Jimp.read(banner);
 
         image.resize(bannerImage.bitmap.width, 44, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.composite(image, 0, bannerImage.bitmap.height - 44);
         bannerImage.scale(2, Jimp.RESIZE_NEAREST_NEIGHBOR);
         bannerImage.getBuffer(Jimp.AUTO, function (err, buffer) {
-            msg.channel.send({ files: [new MessageAttachment(buffer, "hdtf.png")] });
+            intr.reply({ files: [new AttachmentBuilder(buffer, { name: "hdtf.png" })], ephemeral: guildSettings.ephemeral });
         });
     });
 };

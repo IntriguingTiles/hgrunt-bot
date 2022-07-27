@@ -2,13 +2,40 @@ const moment = require("moment");
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
 const FileType = require("file-type");
-const { Client, Message, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction, AttachmentBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "garfield",
-    usage: "garfield [latest] [YYYY-MM-DD]",
-    info: "Now where could my pipe be?"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("garfield")
+        .setDescription("View Garfield comics.")
+        .addSubcommand(cmd =>
+            cmd.setName("random")
+                .setDescription("View a random Garfield comic."))
+        .addSubcommand(cmd =>
+            cmd.setName("latest")
+                .setDescription("View the latest Garfield comic."))
+        .addSubcommand(cmd =>
+            cmd.setName("date")
+                .setDescription("View the Garfield comic published on the specified date.")
+                .addIntegerOption(option =>
+                    option.setName("year")
+                        .setDescription("The year of the comic.")
+                        .setRequired(true)
+                        .setMinValue(1978))
+                .addIntegerOption(option =>
+                    option.setName("month")
+                        .setDescription("The month of the comic.")
+                        .setRequired(true)
+                        .setMinValue(1)
+                        .setMaxValue(12))
+                .addIntegerOption(option =>
+                    option.setName("day")
+                        .setDescription("The day of the comic.")
+                        .setRequired(true)
+                        .setMinValue(1)
+                        .setMaxValue(31)))
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
@@ -16,77 +43,72 @@ exports.aliases = ["gf"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args, guildSettings) => {
+exports.run = async (client, intr, guildSettings) => {
     let attachment;
-    msg.channel.sendTyping();
 
-    if (args.length === 0) {
-        let errCount = 0;
+    switch (intr.options.getSubcommand()) {
+        case "random": {
+            let errCount = 0;
 
-        while (errCount < 5) {
-            try {
-                await msg.channel.send({ files: [await randomComic()] });
-                return;
-            } catch (err) {
-                errCount++;
-            }
-        }
-
-        msg.channel.send("Failed to get a random comic!");
-    } else if (args.length === 1) {
-        try {
-            if (args[0].startsWith("l")) {
+            while (errCount < 5) {
                 try {
-                    attachment = await comicOn(moment().format("YYYY-MM-DD"));
+                    await intr.reply({ files: [await randomComic()], ephemeral: guildSettings.ephemeral });
+                    return;
                 } catch (err) {
-                    return msg.channel.send("Comic for today not found.");
+                    console.log(err);
+                    errCount++;
                 }
-
-                await msg.channel.send({ files: [attachment] });
-                return;
             }
 
-            const date = moment(args[0], moment.ISO_8601);
-
-            if (!date.isValid()) {
-                msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
-                return;
+            intr.reply({ content: "Failed to get a random comic.", ephemeral: true });
+            break;
+        }
+        case "latest":
+            try {
+                attachment = await comicOn(moment().format("YYYY-MM-DD"));
+            } catch (err) {
+                console.log(err);
+                return intr.reply({ content: "Comic for today not found.", ephemeral: true });
             }
+
+            await intr.reply({ files: [attachment], ephemeral: guildSettings.ephemeral });
+            break;
+        case "date": {
+            const date = moment({ year: intr.options.getInteger("year"), month: intr.options.getInteger("month") - 1, day: intr.options.getInteger("day") });
 
             if (date.isBefore(moment("1978-06-19", moment.ISO_8601))) {
-                msg.channel.send(`You can't search for comics earlier than 1978-06-19!\nUse \`${guildSettings.prefix}jon\` to view the prototype Garfield comics.`);
+                intr.reply({ content: "You can't search for comics earlier than 1978-06-19!\nUse `/jon` to view the prototype Garfield comics.", ephemeral: true });
                 return;
             }
 
             try {
                 attachment = await comicOn(date.format("YYYY-MM-DD"));
             } catch (err) {
-                return msg.channel.send("Comic not found.");
+                return intr.reply({ content: "Comic not found.", ephemeral: true });
             }
 
-            await msg.channel.send({ files: [attachment] });
-        } catch (err) {
-            if (err) msg.channel.send(err.message);
+            await intr.reply({ files: [attachment], ephemeral: guildSettings.ephemeral });
+            break;
         }
-    } else {
-        msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
     }
 };
 
 /**
  * 
  * @param {String} date Format is YYYY-MM-DD
- * @returns {MessageAttachment} attachment
+ * @returns {AttachmentBuilder} attachment
  */
 async function comicOn(date) {
     // try to get the higher quality comics first
-    try {
-        const img = (await snekfetch.get(`https://web.archive.org/web/20190203003353if_/https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
-        return new MessageAttachment(img, `${date}.gif`);
-    } catch (err) { /* */ }
+    // don't bother if the year is past 1992 since there are no archives after that
+    if (parseInt(date.split("-")[0]) <= 1992) {
+        try {
+            const img = (await snekfetch.get(`https://web.archive.org/web/20190203003353if_/https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
+            return new AttachmentBuilder(img, { name: `${date}.gif` });
+        } catch (err) { /* */ }
+    }
 
     // The direct image link seems to no longer be predictable, but it
     // can be readily parsed out of the meta tags of the comic page.
@@ -109,7 +131,7 @@ async function comicOn(date) {
     // comics are JPEG.
     const imgType = FileType(imgBuffer);
     const imgName = `${date}.${imgType.ext}`;
-    return new MessageAttachment(imgBuffer, imgName);
+    return new AttachmentBuilder(imgBuffer, { name: imgName });
 }
 
 async function randomComic() {

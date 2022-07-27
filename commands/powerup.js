@@ -1,12 +1,23 @@
 const snekfetch = require("snekfetch");
 const cheerio = require("cheerio");
-const { Client, Message, Collection } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction, Collection, AutocompleteInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
 exports.help = {
     name: "powerup",
     usage: "powerup [search]",
     info: "Gets a random Powerup comic or searches for a Powerup comic."
 };
+
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("powerup")
+        .setDescription("View Powerup comics.")
+        .addStringOption(option =>
+            option.setName("search")
+                .setDescription("The title of the comic to search for.")
+                .setAutocomplete(true))
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
@@ -18,30 +29,43 @@ fillComicList();
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args) => {
-    msg.channel.sendTyping();
-    if (args.length === 0) {
+exports.run = async (client, intr, guildSettings) => {
+    const search = intr.options.getString("search", false);
+
+    if (!search) {
         // random comic
-        sendComic(comicList.random(), msg);
+        sendComic(comicList.random(), intr, guildSettings);
     } else {
         // search for a comic
-        const comic = comicList.get(comicList.keyArray().find(comic => comic.includes(args.join(" ").toLowerCase())));
+        const comic = comicList.find((value, key) => key.includes(search.toLowerCase()));
+
         if (!comic) {
-            msg.channel.send(`No results found for \`${args.join(" ")}\`!`);
+            intr.reply({ content: `No results found for \`${search}\`!`, ephemeral: true });
             return;
         }
-        sendComic(comic, msg);
+
+        sendComic(comic, intr, guildSettings);
     }
 };
 
-async function sendComic(comic, msg) {
+/**
+ * 
+ * @param {Client} client 
+ * @param {AutocompleteInteraction} intr 
+ */
+exports.autocomplete = async (client, intr) => {
+    console.log("autocomplete");
+    const search = intr.options.getFocused();
+    intr.respond(Array.from(comicList.keys()).filter(c => c.includes(search.toLowerCase())).slice(0, 25).map(c => ({ name: c, value: c })));
+};
+
+async function sendComic(comic, intr, guildSettings) {
     const html = (await snekfetch.get(`https://www.theduckwebcomics.com/Powerup_Comics/${comic}/`)).body;
     const $ = cheerio.load(html);
 
-    msg.channel.send({ files: [$(".page-image").first().attr("src")] });
+    intr.reply({ files: [$(".page-image").first().attr("src")], ephemeral: guildSettings.ephemeral });
 }
 
 async function fillComicList() {

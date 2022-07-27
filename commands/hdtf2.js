@@ -1,20 +1,23 @@
 const hdtf = require("../utils/hdtf.js");
 
-exports.help = {
-    name: "hdtf2",
-    usage: "hdtf2 <text>",
-    info: "Generates a HDTF banner"
-};
+const { SlashCommandBuilder } = require("@discordjs/builders");
+
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("hdtf2")
+        .setDescription("Generates an HDTF banner.")
+        .addStringOption(option =>
+            option.setName("text")
+                .setDescription("The text for the banner.")
+                .setRequired(true))
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length <= 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
-
-    hdtf(msg, args, "./hdtf/banner2.png");
+exports.run = async (client, intr, guildSettings) => {
+    hdtf(intr, "./hdtf/banner2.png", guildSettings);
 };

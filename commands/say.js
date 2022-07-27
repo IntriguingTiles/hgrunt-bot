@@ -1,9 +1,9 @@
 const fs = require("fs");
-const tempMessage = require("../utils/tempmessage.js");
 const voice = require("../utils/voice.js");
 const moment = require("moment");
 require("moment-duration-format");
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction, AutocompleteInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
 const hgruntVoiceLines = fs.readdirSync("./voice/hgrunt").reverse();
 const voxVoiceLines = fs.readdirSync("./voice/vox");
@@ -13,13 +13,29 @@ const overwatchVoiceLines = fs.readdirSync("./voice/overwatch");
 
 const rateLimitedUsers = new Map();
 
-exports.help = {
-    name: "say",
-    usage: "say [vox|metrocop|combine|overwatch] <words>",
-    info: "Speaks words in a voice channel"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("say")
+        .setDescription("Plays various Half-Life voice lines in voice chat.")
+        .setDMPermission(false)
+        .addStringOption(option =>
+            option.setName("speaker")
+                .setDescription("The speaker of the words.")
+                .setRequired(true)
+                .addChoices(
+                    { name: "HGrunt", value: "hgrunt" },
+                    { name: "VOX", value: "vox" },
+                    { name: "Metrocop", value: "metrocop" },
+                    { name: "Combine", value: "combine" },
+                    { name: "Overwatch", value: "overwatch" },
+                ))
+        .addStringOption(option =>
+            option.setName("words")
+                .setDescription("The words to speak separated by spaces.")
+                .setAutocomplete(true)
+                .setRequired(true))
+];
 
-exports.requiredPermissions = ["ADD_REACTIONS"];
 exports.disabledInDMs = true;
 
 /**
@@ -31,61 +47,85 @@ exports.init = client => {
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg, args, guildSettings) => {
+exports.run = async (client, intr, guildSettings) => {
     const shouldLimit = guildSettings.limits;
-    if (shouldLimit && args.length >= 20) {
-        msg.react("❌").catch(() => { }); // silently fail
-        msg.channel.send(`Too many words! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
+    const words = intr.options.getString("words").trim().split(" ");
+
+    if (shouldLimit && words.length >= 20) {
+        intr.reply({ content: "Too many words! If you have the `Manage Server` permission, use `/config` to disable the limits.", ephemeral: true });
         return;
     }
-    if (args.length > 0) {
-        switch (args[0]) {
-            case "vox":
-                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [vox] <words>`, { code: "" });
-                args.shift(); // remove vox from args
-                parse(msg, args, guildSettings, voxVoiceLines, "dadeda.wav");
-                break;
-            case "metrocop":
-                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [metrocop] <words>`, { code: "" });
-                args.shift();
-                parse(msg, args, guildSettings, metrocopVoiceLines, "on1.wav", "off1.wav");
-                break;
-            case "combine":
-                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [combine] <words>`, { code: "" });
-                args.shift();
-                parse(msg, args, guildSettings, combineVoiceLines, "on1.wav", "off1.wav");
-                break;
-            case "overwatch":
-                if (args.length < 2) return msg.channel.send(`Usage: ${guildSettings.prefix}say [overwatch] <words>`, { code: "" });
-                args.shift();
-                parse(msg, args, guildSettings, overwatchVoiceLines, "on1.wav", "off1.wav");
-                break;
-            default:
-                parse(msg, args, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
-        }
-    } else {
-        msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+
+    switch (intr.options.getString("speaker")) {
+        case "vox":
+            parse(intr, words, guildSettings, voxVoiceLines, "dadeda.wav");
+            break;
+        case "metrocop":
+            parse(intr, words, guildSettings, metrocopVoiceLines, "on1.wav", "off1.wav");
+            break;
+        case "combine":
+            parse(intr, words, guildSettings, combineVoiceLines, "on1.wav", "off1.wav");
+            break;
+        case "overwatch":
+            parse(intr, words, guildSettings, overwatchVoiceLines, "on1.wav", "off1.wav");
+            break;
+        case "hgrunt":
+            parse(intr, words, guildSettings, hgruntVoiceLines, "clik.wav", "clik.wav");
+            break;
     }
 };
 
 /**
- * @param {Message} msg
+ * 
+ * @param {Client} client 
+ * @param {AutocompleteInteraction} intr 
+ */
+exports.autocomplete = async (client, intr) => {
+    const curWord = intr.options.getFocused().split(" ").at(-1);
+    const prevWords = intr.options.getFocused().split(" ").slice(0, -1).join(" ") + " ";
+    let lines;
+
+    switch (intr.options.getString("speaker")) {
+        case "vox":
+            lines = voxVoiceLines;
+            break;
+        case "metrocop":
+            lines = metrocopVoiceLines;
+            break;
+        case "combine":
+            lines = combineVoiceLines;
+            break;
+        case "overwatch":
+            lines = overwatchVoiceLines;
+            break;
+        case "hgrunt":
+            lines = hgruntVoiceLines;
+            break;
+        default:
+            lines = [];
+            break;
+    }
+
+    intr.respond(lines.filter(v => v.startsWith(curWord.toLowerCase())).slice(0, 25).map(v => v.replace(".wav", "")).map(v => ({ name: prevWords + v, value: prevWords + v })));
+};
+
+/**
+ * @param {ChatInputCommandInteraction} intr
  * @param {string[]} args 
  * @param {string[]} voiceLines 
  * @param {string} firstLine 
  * @param {string} lastLine 
  */
-async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) {
+async function parse(intr, args, guildSettings, voiceLines, firstLine, lastLine) {
     const shouldLimit = guildSettings.limits;
-    if (rateLimitedUsers.has(msg.author.id)) {
-        tempMessage(msg.channel, `You can run that command in ${moment(rateLimitedUsers.get(msg.author.id)).diff(Date.now(), "seconds")} seconds.`, 5000);
+    if (rateLimitedUsers.has(intr.user.id)) {
+        intr.reply({ content: `You can run that command in ${moment(rateLimitedUsers.get(intr.user.id)).diff(Date.now(), "seconds")} seconds.`, ephemeral: true });
         return;
     }
 
-    if (!msg.member.voice.channel) return msg.channel.send("Join a voice channel first!");
+    if (!intr.member.voice.channel) return intr.reply({ content: "Join a voice channel first!", ephemeral: true });
     const location = getVoiceLineLocation(voiceLines);
 
     const lines = [location + firstLine];
@@ -94,9 +134,8 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
         const arg = args[i];
         let foundLine = false;
 
-        if (shouldLimit && args.filter(item => item.replace("!", "").replace(",", "").replace(".", "").toLowerCase() === arg.replace("!", "").replace(",", "").replace(".").toLowerCase()).length > 3) {
-            msg.react("❌").catch(() => { });
-            msg.channel.send(`You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`${guildSettings.prefix}config limits\` to disable the limits.`);
+        if (shouldLimit && args.filter(item => item.replace(/[!,.]/g, "").toLowerCase() === arg.replace(/[!,.]/g, "").toLowerCase()).length > 3) {
+            intr.reply({ content: `You used the word \`${arg}\` too many times! If you have the \`Manage Server\` permission, use \`/config\` to disable the limits.`, ephemeral: true });
             return;
         }
 
@@ -117,8 +156,7 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
         }
 
         if (!foundLine) {
-            msg.react("❌").catch(() => { });
-            msg.channel.send(`I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://bot.hgrunt.xyz.`);
+            intr.reply({ content: `I couldn't find the word \`${arg}\` in my word list!\nMy word list is available at https://bot.hgrunt.xyz.`, ephemeral: true });
             return;
         }
 
@@ -127,14 +165,18 @@ async function parse(msg, args, guildSettings, voiceLines, firstLine, lastLine) 
     }
 
     if (lastLine) lines.push(location + lastLine);
-    msg.client.wordsSaid += args.length;
-    msg.react("👌").catch(() => { });
-    voice.addLines(msg, lines);
+    intr.client.wordsSaid += args.length;
+    try {
+        await voice.addLines(intr, lines);
+        intr.reply("👌").catch(() => { });
+    } catch {
+        // already posted fail message
+    }
 
     if (shouldLimit) {
-        rateLimitedUsers.set(msg.author.id, Date.now() + 10000);
+        rateLimitedUsers.set(intr.user.id, Date.now() + 10000);
         setTimeout(() => {
-            rateLimitedUsers.delete(msg.author.id);
+            rateLimitedUsers.delete(intr.user.id);
         }, 10000);
     }
 }

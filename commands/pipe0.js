@@ -1,17 +1,18 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "pipe0",
-    usage: "pipe0",
-    info: "GARFIELD!!"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("pipe0")
+        .setDescription("View the prototype pipe strip.")
+];
 
 exports.requiredPermissions = ["ATTACH_FILES"];
 
 /**
  * @param {Client} client
- * @param {Message} msg
+ * @param {ChatInputCommandInteraction} intr
  */
-exports.run = async (client, msg) => {
-    msg.channel.send({ files: ["./jon/1976-12-23.png"] });
+exports.run = async (client, intr, guildSettings) => {
+    intr.reply({ files: ["./jon/1976-12-23.png"], ephemeral: guildSettings.ephemeral });
 };
