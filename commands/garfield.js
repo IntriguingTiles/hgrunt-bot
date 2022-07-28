@@ -103,7 +103,7 @@ exports.run = async (client, intr, guildSettings) => {
 async function comicOn(date) {
     // try to get the higher quality comics first
     // don't bother if the year is past 1992 since there are no archives after that
-    if (parseInt(date.split("-")[0]) <= 1992) {
+    if (moment(date, moment.ISO_8601).isBefore(moment("1992-02-26", moment.ISO_8601))) {
         try {
             const img = (await snekfetch.get(`https://web.archive.org/web/20190203003353if_/https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/${date.split("-")[0]}/${date}.gif`)).body;
             return new AttachmentBuilder(img, { name: `${date}.gif` });
