@@ -124,7 +124,7 @@ client.on("messageCreate", async msg => {
 
 // slash commands
 client.on("interactionCreate", async intr => {
-    if (!intr.isChatInputCommand()) return;
+    if (!intr.isChatInputCommand() && !intr.isContextMenuCommand()) return;
     const cmd = intr.commandName;
     if (!(cmd in client.commands)) return;
 
