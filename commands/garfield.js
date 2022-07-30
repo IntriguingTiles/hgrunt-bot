@@ -52,9 +52,11 @@ exports.run = async (client, intr, guildSettings) => {
         case "random": {
             let errCount = 0;
 
+            await intr.deferReply({ ephemeral: guildSettings.ephemeral });
+
             while (errCount < 5) {
                 try {
-                    await intr.reply({ files: [await randomComic()], ephemeral: guildSettings.ephemeral });
+                    await intr.editReply({ files: [await randomComic()], ephemeral: guildSettings.ephemeral });
                     return;
                 } catch (err) {
                     console.log(err);
@@ -62,7 +64,7 @@ exports.run = async (client, intr, guildSettings) => {
                 }
             }
 
-            intr.reply({ content: "Failed to get a random comic.", ephemeral: true });
+            intr.editReply({ content: "Failed to get a random comic.", ephemeral: true });
             break;
         }
         case "latest":
