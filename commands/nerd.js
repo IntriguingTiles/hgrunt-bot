@@ -44,7 +44,7 @@ async function generateNerd(text) {
 	const height = 480 + textHeight;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
-	const nerd = await loadImage("./nerd.png");
+	const nerd = await loadImage("./nerd/nerd.png");
 
 	ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, width, height);
