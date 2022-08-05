@@ -2,6 +2,7 @@ const { Client, ChatInputCommandInteraction } = require("discord.js");  // eslin
 const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
 const { createCanvas, loadImage } = require("canvas");
 const { ApplicationCommandType } = require("discord-api-types/v9");
+const canvasGif = require("@bobwombat/canvas-gif");
 
 exports.commands = [
 	new SlashCommandBuilder()
@@ -10,9 +11,15 @@ exports.commands = [
 		.addStringOption(option =>
 			option.setName("text")
 				.setDescription("The text that will be edited onto the nerd image.")
-				.setRequired(true)),
+				.setRequired(true))
+		.addBooleanOption(option =>
+			option.setName("animated")
+				.setDescription("Whether the resulting nerd will be animated.")),
 	new ContextMenuCommandBuilder()
 		.setName("Nerd")
+		.setType(ApplicationCommandType.Message),
+	new ContextMenuCommandBuilder()
+		.setName("Nerd GIF")
 		.setType(ApplicationCommandType.Message)
 ];
 
@@ -22,6 +29,7 @@ exports.commands = [
  */
 exports.run = async (client, intr, guildSettings) => {
 	let text;
+	const animated = intr.commandName === "Nerd GIF" || intr.options.getBoolean("animated", false);
 
 	if (intr.isContextMenuCommand()) {
 		text = intr.options.getMessage("message").cleanContent;
@@ -29,7 +37,12 @@ exports.run = async (client, intr, guildSettings) => {
 		text = intr.options.getString("text");
 	}
 
-	intr.reply({ files: [await generateNerd(text.substring(0, 800))], ephemeral: guildSettings.ephemeral });
+	if (animated) {
+		await intr.deferReply({ ephemeral: guildSettings.ephemeral });
+		intr.editReply({ files: [{ name: "nerd.gif", attachment: await generateNerdGif(text.substring(0, 800)) }] });
+	} else {
+		intr.reply({ files: [await generateNerd(text.substring(0, 800))], ephemeral: guildSettings.ephemeral });
+	}
 };
 
 async function generateNerd(text) {
@@ -58,6 +71,35 @@ async function generateNerd(text) {
 	}
 
 	return canvas.toBuffer();
+}
+
+async function generateNerdGif(text) {
+	const tempCanvas = createCanvas(640, 1);
+	const tempCtx = tempCanvas.getContext("2d");
+	tempCtx.font = "40px Impact";
+	const multiLine = makeMultilineText(text, tempCtx);
+	const measure = tempCtx.measureText(multiLine);
+	const lines = multiLine.split("\n");
+	const textHeight = measure.emHeightAscent * lines.length;
+	const totalHeight = 640 + textHeight;
+
+	return canvasGif("./nerd/nerd.gif",
+		(ctx, width) => {
+			ctx.fillStyle = "black";
+			ctx.font = "40px Impact";
+			ctx.textAlign = "center";
+
+			for (let i = 0; i < lines.length; i++) {
+				ctx.fillText(lines[i], width / 2, measure.emHeightAscent * (i + 1));
+			}
+		},
+		{
+			fps: 20, // default: 60
+			overrideHeight: totalHeight,
+			gifY: textHeight,
+			backgroundColor: "white"
+		}
+	);
 }
 
 /**
