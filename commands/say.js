@@ -108,7 +108,10 @@ exports.autocomplete = async (client, intr) => {
             break;
     }
 
-    intr.respond(lines.filter(v => v.startsWith(curWord.toLowerCase())).slice(0, 25).map(v => v.replace(".wav", "")).map(v => ({ name: prevWords + v, value: prevWords + v })));
+    intr.respond(lines.filter(v => v.startsWith(curWord.toLowerCase())).slice(0, 25)
+        .map(v => v.replace(".wav", ""))
+        .map(v => ({ name: prevWords + v, value: prevWords + v }))
+        .filter(v => v.name.length <= 100));
 };
 
 /**
