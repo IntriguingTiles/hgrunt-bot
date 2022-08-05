@@ -56,7 +56,7 @@ exports.run = async (client, intr, guildSettings) => {
 
             while (errCount < 5) {
                 try {
-                    await intr.editReply({ files: [await randomComic()], ephemeral: guildSettings.ephemeral });
+                    await intr.editReply({ files: [await randomComic()] });
                     return;
                 } catch (err) {
                     console.log(err);
@@ -64,18 +64,20 @@ exports.run = async (client, intr, guildSettings) => {
                 }
             }
 
-            intr.editReply({ content: "Failed to get a random comic.", ephemeral: true });
+            intr.editReply({ content: "Failed to get a random comic." });
             break;
         }
         case "latest":
+            await intr.deferReply({ ephemeral: guildSettings.ephemeral });
+
             try {
                 attachment = await comicOn(moment().format("YYYY-MM-DD"));
             } catch (err) {
                 console.log(err);
-                return intr.reply({ content: "Comic for today not found.", ephemeral: true });
+                return intr.editReply({ content: "Comic for today not found." });
             }
 
-            await intr.reply({ files: [attachment], ephemeral: guildSettings.ephemeral });
+            await intr.editReply({ files: [attachment] });
             break;
         case "date": {
             const date = moment({ year: intr.options.getInteger("year"), month: intr.options.getInteger("month") - 1, day: intr.options.getInteger("day") });
@@ -85,13 +87,15 @@ exports.run = async (client, intr, guildSettings) => {
                 return;
             }
 
+            await intr.deferReply({ ephemeral: guildSettings.ephemeral });
+
             try {
                 attachment = await comicOn(date.format("YYYY-MM-DD"));
             } catch (err) {
-                return intr.reply({ content: "Comic not found.", ephemeral: true });
+                return intr.editReply({ content: "Comic not found." });
             }
 
-            await intr.reply({ files: [attachment], ephemeral: guildSettings.ephemeral });
+            await intr.editReply({ files: [attachment] });
             break;
         }
     }
