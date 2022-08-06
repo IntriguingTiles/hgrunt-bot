@@ -128,7 +128,13 @@ client.on("interactionCreate", async intr => {
     const cmd = intr.commandName;
     if (!(cmd in client.commands)) return;
 
-    const guildSettings = client.guildSettings.ensure(intr.guild.id, defaultSettings);
+    let guildSettings;
+
+    if (intr.inGuild()) {
+        guildSettings = client.guildSettings.ensure(intr.guild.id, defaultSettings);
+    } else {
+        guildSettings = defaultSettings;
+    }
 
     client.commands[cmd].run(client, intr, guildSettings);
 });
