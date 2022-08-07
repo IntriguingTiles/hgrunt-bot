@@ -2,7 +2,10 @@ const { Client, ChatInputCommandInteraction } = require("discord.js");  // eslin
 const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
 const { createCanvas, loadImage } = require("canvas");
 const { ApplicationCommandType } = require("discord-api-types/v9");
-const canvasGif = require("@bobwombat/canvas-gif");
+const fs = require("fs");
+const crypto = require("crypto");
+const events = require("events");
+const childproc = require("child_process");
 
 exports.commands = [
 	new SlashCommandBuilder()
@@ -39,7 +42,9 @@ exports.run = async (client, intr, guildSettings) => {
 
 	if (animated) {
 		await intr.deferReply({ ephemeral: guildSettings.ephemeral });
-		intr.editReply({ files: [{ name: "nerd.gif", attachment: await generateNerdGif(text.substring(0, 800)) }] });
+		const gif = await generateNerdGif(text.substring(0, 800));
+		await intr.editReply({ files: [gif] });
+		fs.unlink(gif, () => { });
 	} else {
 		intr.reply({ files: [await generateNerd(text.substring(0, 800))], ephemeral: guildSettings.ephemeral });
 	}
@@ -52,7 +57,7 @@ async function generateNerd(text) {
 	const multiLine = makeMultilineText(text, tempCtx);
 	const measure = tempCtx.measureText(multiLine);
 	const lines = multiLine.split("\n");
-	const textHeight = measure.emHeightAscent * lines.length;
+	const textHeight = measure.emHeightAscent * lines.length + tempCtx.measureText(lines.at(-1)).actualBoundingBoxDescent;
 	const width = 498;
 	const height = 480 + textHeight;
 	const canvas = createCanvas(width, height);
@@ -80,26 +85,29 @@ async function generateNerdGif(text) {
 	const multiLine = makeMultilineText(text, tempCtx);
 	const measure = tempCtx.measureText(multiLine);
 	const lines = multiLine.split("\n");
-	const textHeight = measure.emHeightAscent * lines.length;
-	const totalHeight = 640 + textHeight;
+	const textHeight = measure.emHeightAscent * lines.length + tempCtx.measureText(lines.at(-1)).actualBoundingBoxDescent;
+	const canvas = createCanvas(640, textHeight);
+	const ctx = canvas.getContext("2d");
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, 640, textHeight);
+	ctx.fillStyle = "black";
+	ctx.font = "40px Impact";
+	ctx.textAlign = "center";
 
-	return canvasGif("./nerd/nerd.gif",
-		(ctx, width) => {
-			ctx.fillStyle = "black";
-			ctx.font = "40px Impact";
-			ctx.textAlign = "center";
+	for (let i = 0; i < lines.length; i++) {
+		ctx.fillText(lines[i], 640 / 2, measure.emHeightAscent * (i + 1));
+	}
 
-			for (let i = 0; i < lines.length; i++) {
-				ctx.fillText(lines[i], width / 2, measure.emHeightAscent * (i + 1));
-			}
-		},
-		{
-			fps: 20, // default: 60
-			overrideHeight: totalHeight,
-			gifY: textHeight,
-			backgroundColor: "white"
-		}
-	);
+	const headerFileName = `./nerd/tmp/${crypto.randomUUID()}.png`;
+	const gifFileName = `./nerd/tmp/${crypto.randomUUID()}.gif`;
+	const headerStream = fs.createWriteStream(headerFileName);
+	const stream = canvas.createPNGStream();
+	stream.pipe(headerStream);
+	await events.once(headerStream, "finish");
+	const process = childproc.spawn("ffmpeg", ["-i", headerFileName, "-i", "./nerd/nerd.gif", "-i", "./nerd/nerdpalette.png", "-filter_complex", "[0][1]vstack[out],[out][2]paletteuse", "-frames:v", "49", gifFileName]);
+	await events.once(process, "close");
+	fs.unlink(headerFileName, () => { });
+	return gifFileName;
 }
 
 /**
