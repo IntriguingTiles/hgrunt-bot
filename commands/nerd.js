@@ -104,9 +104,11 @@ async function generateNerdGif(text) {
 	const stream = canvas.createPNGStream();
 	stream.pipe(headerStream);
 	await events.once(headerStream, "finish");
-	const process = childproc.spawn("ffmpeg", ["-i", headerFileName, "-i", "./nerd/nerd.gif", "-i", "./nerd/nerdpalette.png", "-filter_complex", "[0][1]vstack[out],[out][2]paletteuse", "-frames:v", "49", gifFileName]);
-	await events.once(process, "close");
+	const ffmpeg = childproc.spawn("ffmpeg", ["-i", headerFileName, "-i", "./nerd/nerd.gif", "-i", "./nerd/nerdpalette.png", "-filter_complex", "[0][1]vstack[out],[out][2]paletteuse", "-frames:v", "49", gifFileName]);
+	await events.once(ffmpeg, "close");
 	fs.unlink(headerFileName, () => { });
+	const gifsicle = childproc.spawn("gifsicle", ["-i", gifFileName, "-O3", "-o", gifFileName]);
+	await events.once(gifsicle, "close");
 	return gifFileName;
 }
 
