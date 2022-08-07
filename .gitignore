@@ -71,3 +71,6 @@ data/
 
 # Jon/Proto-Garfield comics
 jon/
+
+# Temporarily generated nerd gifs
+nerd/tmp/*
