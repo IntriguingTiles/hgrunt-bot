@@ -84,7 +84,7 @@ client.on("messageCreate", async msg => {
 
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
-    if (msg.channel.type !== Discord.ChannelType.DM && !msg.channel.permissionsFor(client.user).has(Discord.PermissionFlagsBits.SendMessages)) return;
+    if (msg.channel.type !== Discord.ChannelType.DM && !msg.channel.permissionsFor(client.user)?.has(Discord.PermissionFlagsBits.SendMessages)) return;
 
     if (prefixMention.test(msg.content) || (msg.channel.type === Discord.ChannelType.DM && !msg.author.bot)) {
         // cleverbot stuff
