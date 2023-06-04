@@ -56,7 +56,6 @@ exports.run = async (client, intr, guildSettings) => {
  * @param {AutocompleteInteraction} intr 
  */
 exports.autocomplete = async (client, intr) => {
-    console.log("autocomplete");
     const search = intr.options.getFocused();
     intr.respond(Array.from(comicList.keys()).filter(c => c.includes(search.toLowerCase())).slice(0, 25).map(c => ({ name: c, value: c })));
 };
@@ -65,7 +64,7 @@ async function sendComic(comic, intr, guildSettings) {
     const html = (await snekfetch.get(`https://www.theduckwebcomics.com/Powerup_Comics/${comic}/`)).body;
     const $ = cheerio.load(html);
 
-    intr.reply({ files: [$(".page-image").first().attr("src")], ephemeral: guildSettings.ephemeral });
+    intr.reply({ files: [`https://www.theduckwebcomics.com/${$(".page-image").first().attr("src")}`], ephemeral: guildSettings.ephemeral });
 }
 
 async function fillComicList() {
