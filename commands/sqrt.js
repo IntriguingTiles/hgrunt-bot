@@ -87,7 +87,7 @@ async function sendComic(url, intr, guildSettings) {
     }
 
     const $ = cheerio.load(html);
-    const img = "http://www.mezzacotta.net/" + $("img").eq(2).attr("src");
+    const img = "http://www.mezzacotta.net/" + $("img").eq(1).attr("src");
 
     intr.reply({ files: [img], ephemeral: guildSettings.ephemeral });
 }
