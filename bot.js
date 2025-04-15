@@ -2,7 +2,6 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const fs = require("fs");
 const Enmap = require("enmap");
-const cleverbot = require("cleverbot-free");
 
 const client = new Discord.Client({
     intents: [
@@ -21,12 +20,7 @@ client.guildSettings = new Enmap({
     cloneLevel: "deep"
 });
 
-let cleverbotContexts = new Discord.Collection();
-
-client.mSent = 0;
 client.wordsSaid = 0;
-
-let prefixMention;
 
 const defaultSettings = {
     limits: true, // should we enable limits
@@ -54,7 +48,6 @@ client.on("ready", () => {
 
     client.loadCommands();
     client.user.setActivity("with slash commands");
-    prefixMention = new RegExp(`^<@!?${client.user.id}> `);
 });
 
 client.on("guildCreate", async guild => {
@@ -85,41 +78,6 @@ client.on("messageCreate", async msg => {
     // don't even bother with the messages if we can't type in that channel
     // also check if we're in a dm first because DM channels don't really have permissions
     if (msg.channel.type !== Discord.ChannelType.DM && !msg.channel.permissionsFor(client.user)?.has(Discord.PermissionFlagsBits.SendMessages)) return;
-
-    if (prefixMention.test(msg.content) || (msg.channel.type === Discord.ChannelType.DM && !msg.author.bot)) {
-        // cleverbot stuff
-        if (msg.author.bot && client.mSent >= 100) return;
-
-        if (msg.content.split(" ")[1] === "eval" && msg.author.id === "221017760111656961") {
-            // can't see message content unless we're pinged so handle the eval command here
-            const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
-            const args = msg.content.split(" ").slice(2);
-            client.commands["eval"].run(client, msg, args, guildSettings);
-            return;
-        }
-
-        msg.channel.sendTyping();
-
-        try {
-            if (!cleverbotContexts.has(msg.author.id)) cleverbotContexts.set(msg.author.id, []);
-            let context = cleverbotContexts.get(msg.author.id);
-            if (context.length > 50) context = [];
-
-            const response = await cleverbot(msg.content.replace(prefixMention, ""), context);
-
-            context.push(msg.content.replace(prefixMention, ""), response);
-
-            cleverbotContexts.set(msg.author.id, context);
-
-            if (msg.channel.type !== Discord.ChannelType.DM) msg.channel.send(`${msg.author} ${response}`);
-            else msg.channel.send(response);
-        } catch (err) {
-            msg.channel.send("Failed to get a response!");
-        }
-
-        if (msg.author.bot) client.mSent++;
-        return;
-    }
 });
 
 // slash commands
@@ -197,11 +155,6 @@ client.loadCommands = () => {
     }
     console.log(`Loaded ${commands.length} commands!`);
 };
-
-// let's clear out the cleverbot contexts every 15 minutes
-setInterval(() => {
-    cleverbotContexts = new Discord.Collection();
-}, 900000);
 
 process.on("SIGINT", async () => {
     client.guildSettings.close();
