@@ -116,27 +116,20 @@ async function comicOn(date) {
         } catch (err) { /* */ }
     }
 
-    // The direct image link seems to no longer be predictable, but it
-    // can be readily parsed out of the meta tags of the comic page.
-    const pageUrl = `https://www.gocomics.com/garfield/${date.replace(/-/g, "/")}`;
-
-    // Non-existent comics now get a 302.
-    const pageResponse = await snekfetch.get(pageUrl, { redirect: false });
-    if (pageResponse.statusCode !== 200) {
-        throw new Error();
+    // either going to be .gif or .jpg, usually .gif so do that first
+    let imgUrl = "";
+    let imgBuffer;
+    try {
+        imgUrl = `http://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.gif`;
+        imgBuffer = (await snekfetch.get(imgUrl)).body;
+    } catch (err) {
+        imgUrl = `http://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.jpg`;
+        imgBuffer = (await snekfetch.get(imgUrl)).body;
     }
 
-    const $ = cheerio.load(pageResponse.body);
-    const imgUrl = $("meta[property='og:image']").attr("content");
-    const imgBuffer = (await snekfetch.get(imgUrl)).body;
-
-    // The URLs no longer have an extension, so they don't embed in
-    // Discord unless we change the filename.  And we might as well
-    // change it anyway, to show the date.  As far as I can tell, the
-    // old comics that existed before the redirect are still GIF but new
-    // comics are JPEG.
     const imgType = FileType(imgBuffer);
     const imgName = `${date}.${imgType.ext}`;
+
     return new AttachmentBuilder(imgBuffer, { name: imgName });
 }
 
@@ -147,7 +140,7 @@ async function randomComic() {
         date = `${Math.floor(Math.random() * (new Date().getFullYear() + 1 - 1978) + 1978)}-${randomMonth()}-${randomDay()}`;
     } while (!moment(date, moment.ISO_8601).isValid() || moment(date, moment.ISO_8601).isBefore(moment("1978-06-19", moment.ISO_8601)) || moment(date, moment.ISO_8601).isAfter(moment()));
 
-    return await comicOn(date);
+    return comicOn(date);
 }
 
 function randomMonth() {
