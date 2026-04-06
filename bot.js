@@ -22,6 +22,8 @@ client.guildSettings = new Enmap({
 
 client.wordsSaid = 0;
 
+let prefixMention;
+
 const defaultSettings = {
     limits: true, // should we enable limits
     ephemeral: false // should interactions only be ephemeral
@@ -48,6 +50,7 @@ client.on("ready", () => {
 
     client.loadCommands();
     client.user.setActivity("with slash commands");
+    prefixMention = new RegExp(`^<@!?${client.user.id}> `);
 });
 
 client.on("guildCreate", async guild => {
@@ -71,6 +74,15 @@ client.on("messageCreate", async msg => {
         try {
             await msg.channel.fetch();
         } catch (err) {
+            return;
+        }
+    }
+
+    if (prefixMention.test(msg.content)) {
+        if (msg.content.split(" ")[1] === "eval" && msg.author.id === "221017760111656961") {
+            const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
+            const args = msg.content.split(" ").slice(2);
+            client.commands["eval"].run(client, msg, args, guildSettings);
             return;
         }
     }
