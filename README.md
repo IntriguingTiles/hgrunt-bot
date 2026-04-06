@@ -29,8 +29,3 @@ If you want `!say` to work, grab the audio files for `hgrunt` and `vox` from Hal
 If you want `!gmg` to work, you'll have to scrape images from [garfield minus garfield](http://garfieldminusgarfield.net/) and place them in `gmg`.
 
 If you want `!jon` to work, you'll have to painstakingly screenshot comics from [this PDF](https://drive.google.com/file/d/1e6qIhEusfMgSJ9-e_R-Vgh4Vrlq93-aw/view), name them the date in ISO 8601 format, and place them in `jon`.
-
-# Credits
-- Miloteza#7639 for the custom VOX lines
-- HeadCrabbed#1477 for the HDTF character set
-- NetwideRogue#0908 for the sqrt command
