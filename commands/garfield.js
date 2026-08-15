@@ -120,10 +120,10 @@ async function comicOn(date) {
     let imgUrl = "";
     let imgBuffer;
     try {
-        imgUrl = `http://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.gif`;
+        imgUrl = `https://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.gif`;
         imgBuffer = (await snekfetch.get(imgUrl)).body;
     } catch (err) {
-        imgUrl = `http://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.jpg`;
+        imgUrl = `https://picayune.uclick.com/comics/ga/${date.split("-")[0]}/ga${date.replaceAll("-", "").substring(2)}.jpg`;
         imgBuffer = (await snekfetch.get(imgUrl)).body;
     }
 
